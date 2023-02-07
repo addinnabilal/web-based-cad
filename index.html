@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" type="module" defer></script>
+    <title>Ms. Pein</title>
+</head>
+<body>
+    <div class="controls">
+        <h3 class="sub-control">
+            <i class="fa-solid fa-palette"></i>
+            Ms. Pein
+        </h3>
+        <div class="sub-control tools">
+            <label>Tools</label>
+            <button>
+                <i class="fa-solid fa-up-down-left-right"></i>
+            </button>
+            <button>
+                <i class="fa-solid fa-expand"></i>
+            </button>
+            <button>
+                <i class="fa-solid fa-fill"></i>
+            </button>
+        </div>
+        <div class="sub-control shapes">
+            <label>Shapes</label>
+            <button>
+                <i class="fa-solid fa-slash"></i>
+            </button>
+            <button>
+                <i class="fa-regular fa-square"></i>
+            </button>
+            <button>
+                <i id="rectangle-icon" class="fa-regular fa-square"></i>
+            </button>
+            <button>
+                <i class="fa-solid fa-draw-polygon"></i>
+            </button>
+        </div>
+        <div class="sub-control colors">
+            <label for="color">Color</label>
+            <input type="color" id="color">
+            <label for="canvas-color">Canvas Color</label>
+            <input type="color" id="canvas-color" value="#000000">
+        </div>
+        <div class="sub-control actions">
+            <button id="clear">Clear</button>
+            <button id="save">Save</button>
+            <button id="load">Load</button>
+        </div>
+    </div>
+    <canvas id="canvas" width="500" height="500">
+        Your browser does not support the canvas element.
+    </canvas>
+</body>
+</html>

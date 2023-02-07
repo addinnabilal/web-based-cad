@@ -1,0 +1,27 @@
+body {
+    background: #555;
+    margin: 0;
+}
+
+#rectangle-icon {
+    transform: scale(1.5,1);
+}
+
+#canvas {
+    background: #fff;
+    border: 1px solid #000;
+    width: 800px;
+    height: 600px;
+    margin: 0.4rem;
+}
+
+.controls {
+    align-items: center;
+    display: flex;
+    background-color: #ddd;
+}
+
+.sub-control {
+    margin: auto;
+    padding: 0.5rem 0;
+}
