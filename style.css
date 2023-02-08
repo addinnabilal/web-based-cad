@@ -12,10 +12,11 @@ body {
     border: 1px solid #000;
     width: 800px;
     height: 600px;
-    margin: 0.4rem;
+    margin: 6.4px;
 }
 
 .controls {
+    height: 42px;
     align-items: center;
     display: flex;
     background-color: #ddd;
@@ -24,4 +25,8 @@ body {
 .sub-control {
     margin: auto;
     padding: 0.5rem 0;
+}
+
+.active {
+    background-color: #ccc;
 }
