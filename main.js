@@ -16,6 +16,7 @@ var colorAttribLocation = null
 var pointSizeUniformLocation = null
 
 
+// Initialize the GL context
 function main() {
     if (gl === null) {
         alert(
@@ -56,8 +57,7 @@ function main() {
     pointSizeUniformLocation = gl.getUniformLocation(program, "pointSize");
 }
 
-
-main()
+main();
 
 
 // Tools activation onclick
