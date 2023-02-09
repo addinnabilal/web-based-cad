@@ -56,6 +56,7 @@ function main() {
     pointSizeUniformLocation = gl.getUniformLocation(program, "pointSize");
 }
 
+
 main()
 
 
@@ -66,6 +67,9 @@ document.querySelectorAll("button").forEach(function(element) {
         if (!this.classList.contains("active")) {
             switch (this.id) {
                 case "line-shape":
+                case "square-shape":
+                case "rectangle-shape":
+                case "polygon-shape":
                     document.getElementById("canvas").style.cursor = "crosshair";
                     break;
                 case "move-tool":
@@ -91,13 +95,9 @@ document.querySelectorAll("button").forEach(function(element) {
         }
     })
 });
-
-// change canvas background color
 document.getElementById("canvas-color").addEventListener("change", function() {
     document.getElementById("canvas").style.backgroundColor = this.value;
 });
-
-// clear canvas
 document.getElementById("clear").addEventListener("click", function() {
     disableAllButtons();
     current.shapes = [];
@@ -110,7 +110,15 @@ document.getElementById("clear").addEventListener("click", function() {
 document.getElementById("canvas").addEventListener("click", function(e) {
     if (current.isDrawing) {
         if (document.getElementById("line-shape").classList.contains("active")) {
-            current.shapes.push({vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
+            current.shapes.push({type: "line", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
+            current.isDrawing = false;
+            return;
+        } else if (document.getElementById("square-shape").classList.contains("active")) {
+            current.shapes.push({type: "square", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
+            current.isDrawing = false;
+            return;
+        } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
+            current.shapes.push({type: "rectangle", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
             current.isDrawing = false;
             return;
         }
@@ -123,6 +131,20 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 color: [document.getElementById("color").value, document.getElementById("color").value]
             }
             drawLine(line);
+        } else if (document.getElementById("square-shape").classList.contains("active")) {
+            current.isDrawing = true;
+            const square = {
+                vertex: [current.start, current.start],
+                color: [document.getElementById("color").value, document.getElementById("color").value]
+            }
+            drawSquare(square);
+        } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
+            current.isDrawing = true;
+            const rectangle = {
+                vertex: [current.start, current.start],
+                color: [document.getElementById("color").value, document.getElementById("color").value]
+            }
+            drawRectangle(rectangle);
         } else if (document.getElementById("color-tool").classList.contains("active")) {
             const selected = getVertexInsideMouse(e);
             if (selected !== undefined) {
@@ -135,9 +157,6 @@ document.getElementById("canvas").addEventListener("click", function(e) {
         }
     }
 });
-
-
-// listen to mouse movements
 document.getElementById("canvas").addEventListener("mousedown", function(e) {
     current.isDragging = true;
     if (document.getElementById("move-tool").classList.contains("active")) {
@@ -151,23 +170,32 @@ document.getElementById("canvas").addEventListener("mousedown", function(e) {
         current.selectedVertexId = dragged.vertexId;
     }
 });
-
-
 document.getElementById("canvas").addEventListener("mouseup", function(e) {
     current.isDragging = false;
 });
-
 document.getElementById("canvas").addEventListener("mousemove", function(e) {
     if (current.isDrawing) {
         if (document.getElementById("line-shape").classList.contains("active")) {
-            if (document.getElementById("line-shape").classList.contains("active")) {
-                refreshCanvas();
-                const line = {
-                    vertex: [current.start, {x: e.offsetX, y: e.offsetY}],
-                    color: [document.getElementById("color").value, document.getElementById("color").value]
-                }
-                drawLine(line);
+            refreshCanvas();
+            const line = {
+                vertex: [current.start, {x: e.offsetX, y: e.offsetY}],
+                color: [document.getElementById("color").value, document.getElementById("color").value]
             }
+            drawLine(line);
+        } else if (document.getElementById("square-shape").classList.contains("active")) {
+            refreshCanvas();
+            const square = {
+                vertex: [current.start, {x: e.offsetX, y: e.offsetY}],
+                color: [document.getElementById("color").value, document.getElementById("color").value]
+            }
+            drawSquare(square);
+        } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
+            refreshCanvas();
+            const rectangle = {
+                vertex: [current.start, {x: e.offsetX, y: e.offsetY}],
+                color: [document.getElementById("color").value, document.getElementById("color").value]
+            }
+            drawRectangle(rectangle);
         }
     } else if (current.isDragging) {
         if (document.getElementById("move-tool").classList.contains("active")) {

@@ -1,9 +1,9 @@
+// Functions
 function convertToWebGLCoordinate(x,y) {
     const glX = (x / canvas.offsetWidth) * 2 - 1;
     const glY = 1 - (y / canvas.clientHeight) * 2;
     return {x: glX, y: glY};
 }
-
 function hexToRGBColor(hex) {
     var bigint = parseInt(hex.replace("#", ""), 16);
     var r = (bigint >> 16) & 255;
@@ -11,19 +11,21 @@ function hexToRGBColor(hex) {
     var b = bigint & 255;
     return {r: r / 255, g: g / 255, b: b / 255};
 }
-
 function disableAllButtons() {
     document.querySelectorAll(".active").forEach(function(element) {
         element.classList.remove("active");
     });
 }
-
 function refreshCanvas() {
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     current.shapes.forEach(function(shape) {
-        if (shape.vertex.length === 2) {
+        if (shape.type === "line") {
             drawLine(shape);
+        } else if (shape.type === "square") {
+            drawSquare(shape);
+        } else if (shape.type === "rectangle") {
+            drawRectangle(shape);
         }
     });
 }
@@ -39,8 +41,6 @@ function getVertexInsideMouse(event) {
         }
     }
 }
-
-
 function getShapeInsideMouse(event) {
     var x = event.offsetX;
     var y = event.offsetY;
