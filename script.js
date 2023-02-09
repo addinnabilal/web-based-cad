@@ -80,8 +80,10 @@ function refreshCanvas() {
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     current.shapes.forEach(function(shape) {
-        if (shape.vertex.length === 2) {
+        if (shape.type === "line") {
             drawLine(shape);
+        } else if (shape.type === "square") {
+            drawSquare(shape);
         }
     });
 }
@@ -164,6 +166,30 @@ function drawLine(line) {
     gl.drawArrays(gl.LINES, 0, 2);
 }
 
+function drawSquare(square) {
+    const start = convertToWebGLCoordinate(square.vertex[0].x, square.vertex[0].y);
+    const end = convertToWebGLCoordinate(square.vertex[1].x, square.vertex[1].y);
+    const color1 = hexToRGBColor(square.color[0]);
+    const color2 = hexToRGBColor(square.color[1]);
+    const vertices = new Float32Array([
+        start.x, start.y, 0, color1.r, color1.g, color1.b,
+        end.x, start.y, 0, color1.r, color1.g, color1.b,
+        end.x, end.y, 0, color2.r, color2.g, color2.b,
+        start.x, end.y, 0, color2.r, color2.g, color2.b,
+        start.x, start.y, 0, color1.r, color1.g, color1.b
+    ]);
+    const vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.enableVertexAttribArray(colorAttribLocation);
+    gl.vertexAttribPointer(
+        positionAttributeLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 0);
+    gl.vertexAttribPointer(
+        colorAttribLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 3*Float32Array.BYTES_PER_ELEMENT);
+    gl.drawArrays(gl.LINE_STRIP, 0, 5);
+}
+
 // Tools activation onclick
 document.querySelectorAll("button").forEach(function(element) {
     element.addEventListener("click", function() {
@@ -211,7 +237,11 @@ document.getElementById("clear").addEventListener("click", function() {
 document.getElementById("canvas").addEventListener("click", function(e) {
     if (current.isDrawing) {
         if (document.getElementById("line-shape").classList.contains("active")) {
-            current.shapes.push({vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
+            current.shapes.push({type: "line", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
+            current.isDrawing = false;
+            return;
+        } else if (document.getElementById("square-shape").classList.contains("active")) {
+            current.shapes.push({type: "square", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
             current.isDrawing = false;
             return;
         }
@@ -224,6 +254,13 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 color: [document.getElementById("color").value, document.getElementById("color").value]
             }
             drawLine(line);
+        } else if (document.getElementById("square-shape").classList.contains("active")) {
+            current.isDrawing = true;
+            const square = {
+                vertex: [current.start, current.start],
+                color: [document.getElementById("color").value, document.getElementById("color").value]
+            }
+            drawSquare(square);
         } else if (document.getElementById("color-tool").classList.contains("active")) {
             const selected = getVertexInsideMouse(e);
             if (selected !== undefined) {
@@ -255,14 +292,19 @@ document.getElementById("canvas").addEventListener("mouseup", function(e) {
 document.getElementById("canvas").addEventListener("mousemove", function(e) {
     if (current.isDrawing) {
         if (document.getElementById("line-shape").classList.contains("active")) {
-            if (document.getElementById("line-shape").classList.contains("active")) {
-                refreshCanvas();
-                const line = {
-                    vertex: [current.start, {x: e.offsetX, y: e.offsetY}],
-                    color: [document.getElementById("color").value, document.getElementById("color").value]
-                }
-                drawLine(line);
+            refreshCanvas();
+            const line = {
+                vertex: [current.start, {x: e.offsetX, y: e.offsetY}],
+                color: [document.getElementById("color").value, document.getElementById("color").value]
             }
+            drawLine(line);
+        } else if (document.getElementById("square-shape").classList.contains("active")) {
+            refreshCanvas();
+            const square = {
+                vertex: [current.start, {x: e.offsetX, y: e.offsetY}],
+                color: [document.getElementById("color").value, document.getElementById("color").value]
+            }
+            drawSquare(square);
         }
     } else if (current.isDragging) {
         if (document.getElementById("move-tool").classList.contains("active")) {
