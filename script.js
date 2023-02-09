@@ -84,6 +84,8 @@ function refreshCanvas() {
             drawLine(shape);
         } else if (shape.type === "square") {
             drawSquare(shape);
+        } else if (shape.type === "rectangle") {
+            drawRectangle(shape);
         }
     });
 }
@@ -171,11 +173,17 @@ function drawSquare(square) {
     const end = convertToWebGLCoordinate(square.vertex[1].x, square.vertex[1].y);
     const color1 = hexToRGBColor(square.color[0]);
     const color2 = hexToRGBColor(square.color[1]);
+    // calculate symmetry
+    const deltaX = end.x - start.x;
+    const deltaY = end.y - start.y;
+    const delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+    const new_end = {x: start.x + delta, y: start.y + delta};
+
     const vertices = new Float32Array([
         start.x, start.y, 0, color1.r, color1.g, color1.b,
-        end.x, start.y, 0, color1.r, color1.g, color1.b,
-        end.x, end.y, 0, color2.r, color2.g, color2.b,
-        start.x, end.y, 0, color2.r, color2.g, color2.b,
+        new_end.x, start.y, 0, color1.r, color1.g, color1.b,
+        new_end.x, new_end.y, 0, color2.r, color2.g, color2.b,
+        start.x, new_end.y, 0, color2.r, color2.g, color2.b,
         start.x, start.y, 0, color1.r, color1.g, color1.b
     ]);
     const vertexBuffer = gl.createBuffer();
@@ -191,10 +199,10 @@ function drawSquare(square) {
 }
 
 function drawRectangle(rectangle) {
-    const start = convertToWebGLCoordinate(square.vertex[0].x, square.vertex[0].y);
-    const end = convertToWebGLCoordinate(square.vertex[1].x, square.vertex[1].y);
-    const color1 = hexToRGBColor(square.color[0]);
-    const color2 = hexToRGBColor(square.color[1]);
+    const start = convertToWebGLCoordinate(rectangle.vertex[0].x, rectangle.vertex[0].y);
+    const end = convertToWebGLCoordinate(rectangle.vertex[1].x, rectangle.vertex[1].y);
+    const color1 = hexToRGBColor(rectangle.color[0]);
+    const color2 = hexToRGBColor(rectangle.color[1]);
     const vertices = new Float32Array([
         start.x, start.y, 0, color1.r, color1.g, color1.b,
         end.x, start.y, 0, color1.r, color1.g, color1.b,
@@ -271,6 +279,10 @@ document.getElementById("canvas").addEventListener("click", function(e) {
             current.shapes.push({type: "square", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
             current.isDrawing = false;
             return;
+        } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
+            current.shapes.push({type: "rectangle", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
+            current.isDrawing = false;
+            return;
         }
     } else {
         current.start = {x: e.offsetX, y: e.offsetY}
@@ -288,6 +300,13 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 color: [document.getElementById("color").value, document.getElementById("color").value]
             }
             drawSquare(square);
+        } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
+            current.isDrawing = true;
+            const rectangle = {
+                vertex: [current.start, current.start],
+                color: [document.getElementById("color").value, document.getElementById("color").value]
+            }
+            drawRectangle(rectangle);
         } else if (document.getElementById("color-tool").classList.contains("active")) {
             const selected = getVertexInsideMouse(e);
             if (selected !== undefined) {
@@ -332,6 +351,13 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
                 color: [document.getElementById("color").value, document.getElementById("color").value]
             }
             drawSquare(square);
+        } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
+            refreshCanvas();
+            const rectangle = {
+                vertex: [current.start, {x: e.offsetX, y: e.offsetY}],
+                color: [document.getElementById("color").value, document.getElementById("color").value]
+            }
+            drawRectangle(rectangle);
         }
     } else if (current.isDragging) {
         if (document.getElementById("move-tool").classList.contains("active")) {
