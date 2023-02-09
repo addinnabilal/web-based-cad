@@ -190,6 +190,30 @@ function drawSquare(square) {
     gl.drawArrays(gl.LINE_STRIP, 0, 5);
 }
 
+function drawRectangle(rectangle) {
+    const start = convertToWebGLCoordinate(square.vertex[0].x, square.vertex[0].y);
+    const end = convertToWebGLCoordinate(square.vertex[1].x, square.vertex[1].y);
+    const color1 = hexToRGBColor(square.color[0]);
+    const color2 = hexToRGBColor(square.color[1]);
+    const vertices = new Float32Array([
+        start.x, start.y, 0, color1.r, color1.g, color1.b,
+        end.x, start.y, 0, color1.r, color1.g, color1.b,
+        end.x, end.y, 0, color2.r, color2.g, color2.b,
+        start.x, end.y, 0, color2.r, color2.g, color2.b,
+        start.x, start.y, 0, color1.r, color1.g, color1.b
+    ]);
+    const vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.enableVertexAttribArray(colorAttribLocation);
+    gl.vertexAttribPointer(
+        positionAttributeLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 0);
+    gl.vertexAttribPointer(
+        colorAttribLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 3*Float32Array.BYTES_PER_ELEMENT);
+    gl.drawArrays(gl.LINE_STRIP, 0, 5);
+}
+
 // Tools activation onclick
 document.querySelectorAll("button").forEach(function(element) {
     element.addEventListener("click", function() {
@@ -197,6 +221,9 @@ document.querySelectorAll("button").forEach(function(element) {
         if (!this.classList.contains("active")) {
             switch (this.id) {
                 case "line-shape":
+                case "square-shape":
+                case "rectangle-shape":
+                case "polygon-shape":
                     document.getElementById("canvas").style.cursor = "crosshair";
                     break;
                 case "move-tool":
