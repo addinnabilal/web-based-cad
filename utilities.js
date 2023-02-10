@@ -26,6 +26,8 @@ function refreshCanvas() {
             drawSquare(shape);
         } else if (shape.type === "rectangle") {
             drawRectangle(shape);
+        } else if (shape.type === "polygon") {
+            drawPolygon(shape, null);
         }
     });
 }

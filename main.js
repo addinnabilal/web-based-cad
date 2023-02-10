@@ -1,7 +1,8 @@
 
 const current = {
     shapes : [],    // {vertex: [{x: 0, y: 0}, {x: 0, y: 0}], color: [#000000, #000000]} (Length of vertex and color is according to the shape)
-    isDrawing : false,
+    isDrawing : false,    
+    isDrawingPolygon : false,
     isDragging : false,
     selectedShapeId : null,
     selectedVertexId : null,
@@ -16,7 +17,6 @@ var colorAttribLocation = null
 var pointSizeUniformLocation = null
 
 
-// Initialize the GL context
 function main() {
     if (gl === null) {
         alert(
@@ -57,8 +57,8 @@ function main() {
     pointSizeUniformLocation = gl.getUniformLocation(program, "pointSize");
 }
 
-main();
 
+main()
 
 // Tools activation onclick
 document.querySelectorAll("button").forEach(function(element) {
@@ -105,9 +105,20 @@ document.getElementById("clear").addEventListener("click", function() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 });
 
+document.getElementById("canvas").addEventListener("contextmenu", function(e) {
+    e.preventDefault()
+    if  (document.getElementById("polygon-shape").classList.contains("active")) {
+        current.isDrawingPolygon = false;
+        drawPolygon(current.shapes[current.shapes.length-1], null)
+        current.isDrawing = false
+
+    }
+})
+
 
 // Canvas click event based on active tools
 document.getElementById("canvas").addEventListener("click", function(e) {
+    console.log(current)
     if (current.isDrawing) {
         if (document.getElementById("line-shape").classList.contains("active")) {
             current.shapes.push({type: "line", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
@@ -121,6 +132,15 @@ document.getElementById("canvas").addEventListener("click", function(e) {
             current.shapes.push({type: "rectangle", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
             current.isDrawing = false;
             return;
+        } else if (document.getElementById("polygon-shape").classList.contains("active")) {
+            if (!current.isDrawingPolygon) {
+                current.shapes.push({type: "polygon", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
+                current.isDrawingPolygon = true
+            } else {
+                current.shapes[current.shapes.length-1].vertex.push({x: e.offsetX, y: e.offsetY})
+                current.shapes[current.shapes.length-1].color.push(document.getElementById("color").value)
+                drawPolygon(current.shapes[current.shapes.length-1], null)
+            }
         }
     } else {
         current.start = {x: e.offsetX, y: e.offsetY}
@@ -145,6 +165,16 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 color: [document.getElementById("color").value, document.getElementById("color").value]
             }
             drawRectangle(rectangle);
+        } else if (document.getElementById("polygon-shape").classList.contains("active")) {
+            current.isDrawing = true;
+            current.isDrawingPolygon = true;
+            const polygon = {
+                type: "polygon",
+                vertex: [current.start, current.start],
+                color: [document.getElementById("color").value, document.getElementById("color").value]
+            }
+            current.shapes.push(polygon)
+            drawPolygon(polygon, null)
         } else if (document.getElementById("color-tool").classList.contains("active")) {
             const selected = getVertexInsideMouse(e);
             if (selected !== undefined) {
@@ -170,9 +200,12 @@ document.getElementById("canvas").addEventListener("mousedown", function(e) {
         current.selectedVertexId = dragged.vertexId;
     }
 });
+
 document.getElementById("canvas").addEventListener("mouseup", function(e) {
     current.isDragging = false;
 });
+
+
 document.getElementById("canvas").addEventListener("mousemove", function(e) {
     if (current.isDrawing) {
         if (document.getElementById("line-shape").classList.contains("active")) {
@@ -196,6 +229,23 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
                 color: [document.getElementById("color").value, document.getElementById("color").value]
             }
             drawRectangle(rectangle);
+        } else if (document.getElementById("polygon-shape").classList.contains("active") && current.isDrawingPolygon) {
+            console.log("asa")
+            refreshCanvas();
+            const currentShapeIndex = current.shapes.length-1
+            var polygon = {
+                vertex : current.shapes[currentShapeIndex].vertex,
+                color: current.shapes[currentShapeIndex].color,
+            }
+            
+            const polygonSize = polygon.vertex.length
+            // const newVertex = {
+            //     vertex: {x: e.offsetX, y: e.offsetY},
+            //     color: document.getElementById("color").value
+            // }
+            polygon.vertex[currentShapeIndex-1] = {x: e.offsetX, y: e.offsetY}
+            polygon.color[currentShapeIndex-1] = document.getElementById("color").value
+            drawPolygon(polygon, null)
         }
     } else if (current.isDragging) {
         if (document.getElementById("move-tool").classList.contains("active")) {
