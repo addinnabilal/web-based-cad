@@ -125,7 +125,30 @@ document.getElementById("canvas").addEventListener("click", function(e) {
             current.isDrawing = false;
             return;
         } else if (document.getElementById("square-shape").classList.contains("active")) {
-            current.shapes.push({type: "square", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
+            let start = current.start;
+            let end = {x: e.offsetX, y: e.offsetY};
+
+            const deltaX = end.x - start.x;
+            const deltaY = end.y - start.y;
+
+            const absDeltaX = deltaX < 0 ? -1*deltaX : deltaX;
+            const absDeltaY = deltaY < 0 ? -1*deltaY : deltaY;
+            if (absDeltaX > absDeltaY) {
+                end.y = deltaY > 0 ? start.y + absDeltaX : start.y - absDeltaX;
+            } else {
+                end.x = deltaX > 0 ? start.x + absDeltaY : start.x - absDeltaY;
+            }
+            
+            current.shapes.push({
+                type: "square", 
+                vertex: [
+                    start,
+                    {x: end.x, y: start.y},
+                    end,
+                    {x: start.x, y: end.y}
+                ], 
+                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
+            });
             current.isDrawing = false;
             return;
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
@@ -154,8 +177,8 @@ document.getElementById("canvas").addEventListener("click", function(e) {
         } else if (document.getElementById("square-shape").classList.contains("active")) {
             current.isDrawing = true;
             const square = {
-                vertex: [current.start, current.start],
-                color: [document.getElementById("color").value, document.getElementById("color").value]
+                vertex: [current.start, current.start, current.start, current.start],
+                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
             }
             drawSquare(square);
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
@@ -217,9 +240,27 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
             drawLine(line);
         } else if (document.getElementById("square-shape").classList.contains("active")) {
             refreshCanvas();
+            let start = current.start;
+            let end = {x: e.offsetX, y: e.offsetY};
+
+            const deltaX = end.x - start.x;
+            const deltaY = end.y - start.y;
+
+            const absDeltaX = deltaX < 0 ? -1*deltaX : deltaX;
+            const absDeltaY = deltaY < 0 ? -1*deltaY : deltaY;
+            if (absDeltaX > absDeltaY) {
+                end.y = deltaY > 0 ? start.y + absDeltaX : start.y - absDeltaX;
+            } else {
+                end.x = deltaX > 0 ? start.x + absDeltaY : start.x - absDeltaY;
+            }
             const square = {
-                vertex: [current.start, {x: e.offsetX, y: e.offsetY}],
-                color: [document.getElementById("color").value, document.getElementById("color").value]
+                vertex: [
+                    start,
+                    {x: end.x, y: start.y},
+                    end,
+                    {x: start.x, y: end.y}
+                ],
+                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
             }
             drawSquare(square);
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
