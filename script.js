@@ -47,21 +47,31 @@ function drawLine(line) {
 }
 
 function drawSquare(square) {
-    const start = convertToWebGLCoordinate(square.vertex[0].x, square.vertex[0].y);
-    const end = convertToWebGLCoordinate(square.vertex[1].x, square.vertex[1].y);
-    const color1 = hexToRGBColor(square.color[0]);
-    const color2 = hexToRGBColor(square.color[1]);
-    // calculate symmetry
+    let start = {x: square.vertex[0].x, y: square.vertex[0].y};
+    let end = {x: square.vertex[1].x, y: square.vertex[1].y};
+
     const deltaX = end.x - start.x;
     const deltaY = end.y - start.y;
-    const delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
-    const new_end = {x: start.x + delta, y: start.y + delta};
 
+    const absDeltaX = deltaX < 0 ? -1*deltaX : deltaX;
+    const absDeltaY = deltaY < 0 ? -1*deltaY : deltaY;
+    if (absDeltaX > absDeltaY) {
+        end.y = deltaY > 0 ? start.y + absDeltaX : start.y - absDeltaX;
+    } else {
+        end.x = deltaX > 0 ? start.x + absDeltaY : start.x - absDeltaY;
+    }
+
+    start = convertToWebGLCoordinate(start.x, start.y);
+    end = convertToWebGLCoordinate(end.x, end.y);
+    
+    const color1 = hexToRGBColor(square.color[0]);
+    const color2 = hexToRGBColor(square.color[1]);
+    
     const vertices = new Float32Array([
         start.x, start.y, 0, color1.r, color1.g, color1.b,
-        new_end.x, start.y, 0, color1.r, color1.g, color1.b,
-        new_end.x, new_end.y, 0, color2.r, color2.g, color2.b,
-        start.x, new_end.y, 0, color2.r, color2.g, color2.b,
+        end.x, start.y, 0, color1.r, color1.g, color1.b,
+        end.x, end.y, 0, color2.r, color2.g, color2.b,
+        start.x, end.y, 0, color2.r, color2.g, color2.b,
         start.x, start.y, 0, color1.r, color1.g, color1.b
     ]);
     const vertexBuffer = gl.createBuffer();
