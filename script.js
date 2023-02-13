@@ -103,7 +103,7 @@ function drawRectangle(rectangle) {
         positionAttributeLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 0);
     gl.vertexAttribPointer(
         colorAttribLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 3*Float32Array.BYTES_PER_ELEMENT);
-    gl.drawArrays(gl.LINE_STRIP, 0, 5);
+    gl.drawArrays(rectangle.isFilled? gl.TRIANGLE_STRIP : gl.LINE_STRIP, 0, 5);
 }
 
 function drawPolygon(oldPolygon, newVertex) {
