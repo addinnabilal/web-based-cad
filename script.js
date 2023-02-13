@@ -47,7 +47,6 @@ function drawLine(line) {
 }
 
 function drawSquare(square) {
-    console.log(square.isFilled);
     const ver1 = convertToWebGLCoordinate(square.vertex[0].x, square.vertex[0].y);
     const ver2 = convertToWebGLCoordinate(square.vertex[1].x, square.vertex[1].y);
     const ver3 = convertToWebGLCoordinate(square.vertex[2].x, square.vertex[2].y);

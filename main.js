@@ -211,7 +211,6 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 current.shapes[selected.shapeId].color[selected.vertexId] = document.getElementById("color").value;
             } else if (getShapeInsideMouse(e) !== undefined) {
                 const selected = getShapeInsideMouse(e);
-                console.log(selected);
                 current.shapes[selected].color.forEach((color, index) => {
                     current.shapes[selected].color[index] = document.getElementById("color").value;
                 });
@@ -318,9 +317,27 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
             if (current.selectedShapeId !== undefined && current.selectedVertexId !== undefined) {
                 current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
                 current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
+                // Square
+                if (current.shapes[current.selectedShapeId].type === "square") {
+                    if (current.selectedVertexId % 2 === 1) {
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += e.movementX;
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y -= e.movementX;
+                    } else {
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y -= e.movementX;
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += e.movementX;
+                    }
+                } else if (current.shapes[current.selectedShapeId].type === "rectangle") { //rectangle
+                    if (current.selectedVertexId % 2 === 1) {
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += e.movementX;
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y += e.movementY;
+                    } else {
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += e.movementY;
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += e.movementX;
+                    }
+                }
+                refreshCanvas();
+                drawAllVertex();
             }
-            refreshCanvas();
-            drawAllVertex();
         }
     }
 });
