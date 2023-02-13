@@ -77,6 +77,7 @@ document.querySelectorAll("button").forEach(function(element) {
                     break;
                 case "resize-tool":
                     drawAllVertex();
+                    console.log(current.shapes);
                     document.getElementById("canvas").style.cursor = "se-resize";
                     break;
                 case "color-tool":
@@ -118,12 +119,11 @@ document.getElementById("canvas").addEventListener("contextmenu", function(e) {
 
 // Canvas click event based on active tools
 document.getElementById("canvas").addEventListener("click", function(e) {
-    console.log(current)
+    console.log("ke sini?");
     if (current.isDrawing) {
+        current.isDrawing = false;
         if (document.getElementById("line-shape").classList.contains("active")) {
             current.shapes.push({type: "line", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
-            current.isDrawing = false;
-            return;
         } else if (document.getElementById("square-shape").classList.contains("active")) {
             let start = current.start;
             let end = {x: e.offsetX, y: e.offsetY};
@@ -149,12 +149,18 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 ], 
                 color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
             });
-            current.isDrawing = false;
-            return;
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
-            current.shapes.push({type: "rectangle", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
-            current.isDrawing = false;
-            return;
+            console.log("ke sini kan?");
+            current.shapes.push({
+                type: "rectangle", 
+                vertex: [
+                    current.start, 
+                    {x: e.offsetX, y: current.start.y},
+                    {x: e.offsetX, y: e.offsetY},
+                    {x: current.start.x, y: e.offsetY}
+                ], 
+                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
+            });
         } else if (document.getElementById("polygon-shape").classList.contains("active")) {
             if (!current.isDrawingPolygon) {
                 current.shapes.push({type: "polygon", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
@@ -184,8 +190,8 @@ document.getElementById("canvas").addEventListener("click", function(e) {
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
             current.isDrawing = true;
             const rectangle = {
-                vertex: [current.start, current.start],
-                color: [document.getElementById("color").value, document.getElementById("color").value]
+                vertex: [current.start, current.start, current.start, current.start],
+                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
             }
             drawRectangle(rectangle);
         } else if (document.getElementById("polygon-shape").classList.contains("active")) {
@@ -266,8 +272,13 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
             refreshCanvas();
             const rectangle = {
-                vertex: [current.start, {x: e.offsetX, y: e.offsetY}],
-                color: [document.getElementById("color").value, document.getElementById("color").value]
+                vertex: [
+                    current.start, 
+                    {x: e.offsetX, y: current.start.y},
+                    {x: e.offsetX, y: e.offsetY},
+                    {x: current.start.x, y: e.offsetY}
+                ],
+                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
             }
             drawRectangle(rectangle);
         } else if (document.getElementById("polygon-shape").classList.contains("active") && current.isDrawingPolygon) {

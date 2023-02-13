@@ -77,16 +77,22 @@ function drawSquare(square) {
 }
 
 function drawRectangle(rectangle) {
-    const start = convertToWebGLCoordinate(rectangle.vertex[0].x, rectangle.vertex[0].y);
-    const end = convertToWebGLCoordinate(rectangle.vertex[1].x, rectangle.vertex[1].y);
+    const ver1 = convertToWebGLCoordinate(rectangle.vertex[0].x, rectangle.vertex[0].y);
+    const ver2 = convertToWebGLCoordinate(rectangle.vertex[1].x, rectangle.vertex[1].y);
+    const ver3 = convertToWebGLCoordinate(rectangle.vertex[2].x, rectangle.vertex[2].y);
+    const ver4 = convertToWebGLCoordinate(rectangle.vertex[3].x, rectangle.vertex[3].y);
+
     const color1 = hexToRGBColor(rectangle.color[0]);
     const color2 = hexToRGBColor(rectangle.color[1]);
+    const color3 = hexToRGBColor(rectangle.color[2]);
+    const color4 = hexToRGBColor(rectangle.color[3]);
+
     const vertices = new Float32Array([
-        start.x, start.y, 0, color1.r, color1.g, color1.b,
-        end.x, start.y, 0, color1.r, color1.g, color1.b,
-        end.x, end.y, 0, color2.r, color2.g, color2.b,
-        start.x, end.y, 0, color2.r, color2.g, color2.b,
-        start.x, start.y, 0, color1.r, color1.g, color1.b
+        ver1.x, ver1.y, 0, color1.r, color1.g, color1.b,
+        ver2.x, ver2.y, 0, color2.r, color2.g, color2.b,
+        ver3.x, ver3.y, 0, color3.r, color3.g, color3.b,
+        ver4.x, ver4.y, 0, color4.r, color4.g, color4.b,
+        ver1.x, ver1.y, 0, color1.r, color1.g, color1.b
     ]);
     const vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
