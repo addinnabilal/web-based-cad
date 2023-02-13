@@ -57,8 +57,7 @@ function main() {
     pointSizeUniformLocation = gl.getUniformLocation(program, "pointSize");
 }
 
-
-main()
+main();
 
 // Tools activation onclick
 document.querySelectorAll("button").forEach(function(element) {
@@ -123,28 +122,11 @@ document.getElementById("canvas").addEventListener("click", function(e) {
         if (document.getElementById("line-shape").classList.contains("active")) {
             current.shapes.push({type: "line", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
         } else if (document.getElementById("square-shape").classList.contains("active")) {
-            let start = current.start;
-            let end = {x: e.offsetX, y: e.offsetY};
-
-            const deltaX = end.x - start.x;
-            const deltaY = end.y - start.y;
-
-            const absDeltaX = deltaX < 0 ? -1*deltaX : deltaX;
-            const absDeltaY = deltaY < 0 ? -1*deltaY : deltaY;
-            if (absDeltaX > absDeltaY) {
-                end.y = deltaY > 0 ? start.y + absDeltaX : start.y - absDeltaX;
-            } else {
-                end.x = deltaX > 0 ? start.x + absDeltaY : start.x - absDeltaY;
-            }
-            
+            const start = current.start;
+            const end = {x: e.offsetX, y: e.offsetY};            
             current.shapes.push({
                 type: "square", 
-                vertex: [
-                    start,
-                    {x: end.x, y: start.y},
-                    end,
-                    {x: start.x, y: end.y}
-                ], 
+                vertex: calculateSquareVertices(start, end), 
                 color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
                 isFilled: false
             });
@@ -251,26 +233,10 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
             drawLine(line);
         } else if (document.getElementById("square-shape").classList.contains("active")) {
             refreshCanvas();
-            let start = current.start;
-            let end = {x: e.offsetX, y: e.offsetY};
-
-            const deltaX = end.x - start.x;
-            const deltaY = end.y - start.y;
-
-            const absDeltaX = deltaX < 0 ? -1*deltaX : deltaX;
-            const absDeltaY = deltaY < 0 ? -1*deltaY : deltaY;
-            if (absDeltaX > absDeltaY) {
-                end.y = deltaY > 0 ? start.y + absDeltaX : start.y - absDeltaX;
-            } else {
-                end.x = deltaX > 0 ? start.x + absDeltaY : start.x - absDeltaY;
-            }
+            const start = current.start;
+            const end = {x: e.offsetX, y: e.offsetY};
             const square = {
-                vertex: [
-                    start,
-                    {x: end.x, y: start.y},
-                    end,
-                    {x: start.x, y: end.y}
-                ],
+                vertex: calculateSquareVertices(start, end),
                 color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
             }
             drawSquare(square);
@@ -315,18 +281,20 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
             refreshCanvas();
         } else if (document.getElementById("resize-tool").classList.contains("active")) {
             if (current.selectedShapeId !== undefined && current.selectedVertexId !== undefined) {
-                current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
-                current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
-                // Square
                 if (current.shapes[current.selectedShapeId].type === "square") {
+                    const delta = Math.abs(e.movementX) > Math.abs(e.movementY) ? e.movementX : e.movementY;
+                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += delta;
+                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += delta;
                     if (current.selectedVertexId % 2 === 1) {
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += e.movementX;
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y -= e.movementX;
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += delta;
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y += delta;
                     } else {
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y -= e.movementX;
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += e.movementX;
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += delta;
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += delta;
                     }
-                } else if (current.shapes[current.selectedShapeId].type === "rectangle") { //rectangle
+                } else if (current.shapes[current.selectedShapeId].type === "rectangle") {
+                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
+                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
                     if (current.selectedVertexId % 2 === 1) {
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += e.movementX;
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y += e.movementY;
@@ -334,6 +302,9 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += e.movementY;
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += e.movementX;
                     }
+                } else {
+                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
+                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
                 }
                 refreshCanvas();
                 drawAllVertex();

@@ -79,3 +79,22 @@ function getShapeInsideMouse(event) {
         }
     }
 }
+function calculateSquareVertices(start, end) {
+    const deltaX = end.x - start.x;
+    const deltaY = end.y - start.y;
+    let newEnd = end;
+
+    const absDeltaX = deltaX < 0 ? -1*deltaX : deltaX;
+    const absDeltaY = deltaY < 0 ? -1*deltaY : deltaY;
+    if (absDeltaX > absDeltaY) {
+        newEnd.y = deltaY > 0 ? start.y + absDeltaX : start.y - absDeltaX;
+    } else {
+        newEnd.x = deltaX > 0 ? start.x + absDeltaY : start.x - absDeltaY;
+    }
+    return ([
+        start,
+        {x: newEnd.x, y: start.y},
+        newEnd,
+        {x: start.x, y: newEnd.y}
+    ]);
+}
