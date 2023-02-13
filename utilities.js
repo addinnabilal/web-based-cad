@@ -59,8 +59,7 @@ function getShapeInsideMouse(event) {
             if (distance <= 10) {
                 return i;
             }
-        } else {
-            // check if the point is inside a polygon
+        } else { // check if the point is inside a polygon
             var j = current.shapes[i].vertex.length - 1;
             var inside = false;
             for (var k = 0; k < current.shapes[i].vertex.length; k++) {

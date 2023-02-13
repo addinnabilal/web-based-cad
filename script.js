@@ -47,6 +47,7 @@ function drawLine(line) {
 }
 
 function drawSquare(square) {
+    console.log(square.isFilled);
     const ver1 = convertToWebGLCoordinate(square.vertex[0].x, square.vertex[0].y);
     const ver2 = convertToWebGLCoordinate(square.vertex[1].x, square.vertex[1].y);
     const ver3 = convertToWebGLCoordinate(square.vertex[2].x, square.vertex[2].y);
@@ -73,7 +74,7 @@ function drawSquare(square) {
         positionAttributeLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 0);
     gl.vertexAttribPointer(
         colorAttribLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 3*Float32Array.BYTES_PER_ELEMENT);
-    gl.drawArrays(gl.LINE_STRIP, 0, 5);
+    gl.drawArrays(square.isFilled? gl.TRIANGLE_STRIP : gl.LINE_STRIP, 0, 5);
 }
 
 function drawRectangle(rectangle) {

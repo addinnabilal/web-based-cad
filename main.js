@@ -145,7 +145,8 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                     end,
                     {x: start.x, y: end.y}
                 ], 
-                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
+                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
+                isFilled: false
             });
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
             current.shapes.push({
@@ -156,7 +157,8 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                     {x: e.offsetX, y: e.offsetY},
                     {x: current.start.x, y: e.offsetY}
                 ], 
-                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
+                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
+                isFilled: false
             });
         } else if (document.getElementById("polygon-shape").classList.contains("active")) {
             if (!current.isDrawingPolygon) {
@@ -181,14 +183,16 @@ document.getElementById("canvas").addEventListener("click", function(e) {
             current.isDrawing = true;
             const square = {
                 vertex: [current.start, current.start, current.start, current.start],
-                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
+                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
+                isFilled: false
             }
             drawSquare(square);
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
             current.isDrawing = true;
             const rectangle = {
                 vertex: [current.start, current.start, current.start, current.start],
-                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
+                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
+                isFilled: false
             }
             drawRectangle(rectangle);
         } else if (document.getElementById("polygon-shape").classList.contains("active")) {
@@ -202,13 +206,18 @@ document.getElementById("canvas").addEventListener("click", function(e) {
             current.shapes.push(polygon)
             drawPolygon(polygon, null)
         } else if (document.getElementById("color-tool").classList.contains("active")) {
-            const selected = getVertexInsideMouse(e);
-            if (selected !== undefined) {
+            if (getVertexInsideMouse(e) !== undefined) {
+                const selected = getVertexInsideMouse(e);
                 current.shapes[selected.shapeId].color[selected.vertexId] = document.getElementById("color").value;
-                refreshCanvas();
-            } else {
-                // warnain dalem shape
+            } else if (getShapeInsideMouse(e) !== undefined) {
+                const selected = getShapeInsideMouse(e);
+                console.log(selected);
+                current.shapes[selected].color.forEach((color, index) => {
+                    current.shapes[selected].color[index] = document.getElementById("color").value;
+                });
+                current.shapes[selected].isFilled = true;
             }
+            refreshCanvas();
             drawAllVertex(true);
         }
     }
