@@ -77,7 +77,6 @@ document.querySelectorAll("button").forEach(function(element) {
                     break;
                 case "resize-tool":
                     drawAllVertex();
-                    console.log(current.shapes);
                     document.getElementById("canvas").style.cursor = "se-resize";
                     break;
                 case "color-tool":
@@ -119,7 +118,6 @@ document.getElementById("canvas").addEventListener("contextmenu", function(e) {
 
 // Canvas click event based on active tools
 document.getElementById("canvas").addEventListener("click", function(e) {
-    console.log("ke sini?");
     if (current.isDrawing) {
         current.isDrawing = false;
         if (document.getElementById("line-shape").classList.contains("active")) {
@@ -150,7 +148,6 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
             });
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
-            console.log("ke sini kan?");
             current.shapes.push({
                 type: "rectangle", 
                 vertex: [
