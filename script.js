@@ -110,7 +110,7 @@ function drawPolygon(oldPolygon, newVertex) {
     var vertices = [];
     var size = oldPolygon.vertex.length
 
-    for (var i=0; i<size;i++) {
+    for (var i = 0; i < size; i++) {
         convertedVertex = convertToWebGLCoordinate(oldPolygon.vertex[i].x, oldPolygon.vertex[i].y)
         const color = hexToRGBColor(oldPolygon.color[i]);
         vertices.push(convertedVertex.x, convertedVertex.y, 0, color.r, color.g, color.b)
