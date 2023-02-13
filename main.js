@@ -143,9 +143,10 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 isFilled: false
             });
         } else if (document.getElementById("polygon-shape").classList.contains("active")) {
+            current.isDrawing = true;
             if (!current.isDrawingPolygon) {
                 current.shapes.push({type: "polygon", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
-                current.isDrawingPolygon = true
+                current.isDrawingPolygon = true;
             } else {
                 current.shapes[current.shapes.length-1].vertex.push({x: e.offsetX, y: e.offsetY})
                 current.shapes[current.shapes.length-1].color.push(document.getElementById("color").value)
