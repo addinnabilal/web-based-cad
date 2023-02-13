@@ -61,18 +61,32 @@ function getShapeInsideMouse(event) {
                 return i;
             }
         } else { // check if the point is inside a polygon
-            var j = current.shapes[i].vertex.length - 1;
+            // var j = current.shapes[i].vertex.length - 1;
+            // var inside = false;
+            // for (var k = 0; k < current.shapes[i].vertex.length; k++) {
+            //     if (current.shapes[i].vertex[k].y < y && current.shapes[i].vertex[j].y >= y ||
+            //         current.shapes[i].vertex[j].y < y && current.shapes[i].vertex[k].y >= y) {
+            //         if (current.shapes[i].vertex[k].x + (y - current.shapes[i].vertex[k].y) /
+            //             (current.shapes[i].vertex[j].y - current.shapes[i].vertex[k].y) *
+            //             (current.shapes[i].vertex[j].x - current.shapes[i].vertex[k].x) < x) {
+            //             inside = !inside;
+            //         }
+            //     }
+            //     j = k;
+            // }
+            // if (inside) {
+            //     document.getElementById("rotation_angle").value = current.shapes[i].theta
+            //     return i;
+            // }
+            const shape = current.shapes[i]
             var inside = false;
-            for (var k = 0; k < current.shapes[i].vertex.length; k++) {
-                if (current.shapes[i].vertex[k].y < y && current.shapes[i].vertex[j].y >= y ||
-                    current.shapes[i].vertex[j].y < y && current.shapes[i].vertex[k].y >= y) {
-                    if (current.shapes[i].vertex[k].x + (y - current.shapes[i].vertex[k].y) /
-                        (current.shapes[i].vertex[j].y - current.shapes[i].vertex[k].y) *
-                        (current.shapes[i].vertex[j].x - current.shapes[i].vertex[k].x) < x) {
-                        inside = !inside;
-                    }
+            var k = 0, j = shape.vertex.length - 1;
+            for (k, j; k < shape.vertex.length; j = k++) {
+                console.log(inside)
+                if ( (shape.vertex[k].y > y) != (shape.vertex[j].y > y) &&
+                        x < (shape.vertex[j].x - shape.vertex[k].x) * (y - shape.vertex[k].y) / (shape.vertex[j].y - shape.vertex[k].y) + shape.vertex[k].x ) {
+                    inside = !inside;
                 }
-                j = k;
             }
             if (inside) {
                 document.getElementById("rotation_angle").value = current.shapes[i].theta
@@ -153,10 +167,10 @@ function getCenter(shapeId) {
         minY = shape.vertex[0].y
         maxY = shape.vertex[0].y
         for (let vertex of shape.vertex) {
-            minX = vertex.x < minX? vertex.x : minX
-            minY = vertex.y < minY? vertex.y : minY
-            maxX = vertex.x > maxX? vertex.x : maxX
-            maxY = vertex.y > maxY? vertex.y : maxY
+            minX = Math.min(minX, vertex.x)
+            minY = Math.min(minY, vertex.y)
+            maxX = Math.max(maxX, vertex.x)
+            maxY = Math.max(maxY, vertex.y)
         }
         x = (minX + maxX) / 2
         y = (minY + maxY) / 2

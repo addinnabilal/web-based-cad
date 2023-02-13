@@ -188,7 +188,8 @@ document.getElementById("canvas").addEventListener("click", function(e) {
             const polygon = {
                 type: "polygon",
                 vertex: [current.start, current.start],
-                color: [document.getElementById("color").value, document.getElementById("color").value]
+                color: [document.getElementById("color").value, document.getElementById("color").value],
+                theta: 0
             }
             current.shapes.push(polygon)
             drawPolygon(polygon, null)
