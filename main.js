@@ -284,12 +284,14 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
             if (current.selectedShapeId !== undefined && current.selectedVertexId !== undefined) {
                 if (current.shapes[current.selectedShapeId].type === "square") {
                     const delta = Math.abs(e.movementX) > Math.abs(e.movementY) ? e.movementX : e.movementY;
-                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += delta;
-                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += delta;
                     if (current.selectedVertexId % 2 === 1) {
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += delta;
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y -= delta;
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += delta;
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y += delta;
+                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y -= delta;
                     } else {
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += delta;
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += delta;
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += delta;
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += delta;
                     }
