@@ -1,7 +1,8 @@
 
 const current = {
-    shapes : [],    // {vertex: [{x: 0, y: 0}, {x: 0, y: 0}], color: [#000000, #000000]} (Length of vertex and color is according to the shape)
-    isDrawing : false,    
+    shapes : [],    // {vertex: [{x: 0, y: 0}, {x: 0, y: 0}], color: [#000000, #000000], theta: 250} (Length of vertex and color is according to the shape)
+    isDrawing : false,   
+    isCreating: false, 
     isDrawingPolygon : false,
     isDragging : false,
     selectedShapeId : null,
@@ -86,6 +87,7 @@ document.querySelectorAll("button").forEach(function(element) {
                     break;
             }
             disableAllButtons();
+            current.isCreating = true;
         }
         current.isDrawing = false;
         this.classList.toggle("active");
@@ -120,7 +122,7 @@ document.getElementById("canvas").addEventListener("click", function(e) {
     if (current.isDrawing) {
         current.isDrawing = false;
         if (document.getElementById("line-shape").classList.contains("active")) {
-            current.shapes.push({type: "line", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
+            current.shapes.push({type: "line", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value], theta: 0});
         } else if (document.getElementById("square-shape").classList.contains("active")) {
             const start = current.start;
             const end = {x: e.offsetX, y: e.offsetY};            
@@ -128,7 +130,8 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 type: "square", 
                 vertex: calculateSquareVertices(start, end), 
                 color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
-                isFilled: false
+                isFilled: false,
+                theta: 0
             });
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
             current.shapes.push({
@@ -140,12 +143,13 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                     {x: current.start.x, y: e.offsetY}
                 ], 
                 color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
-                isFilled: false
+                isFilled: false,
+                theta: 0
             });
         } else if (document.getElementById("polygon-shape").classList.contains("active")) {
             current.isDrawing = true;
             if (!current.isDrawingPolygon) {
-                current.shapes.push({type: "polygon", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value]});
+                current.shapes.push({type: "polygon", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value], theta: 0});
                 current.isDrawingPolygon = true;
             } else {
                 current.shapes[current.shapes.length-1].vertex.push({x: e.offsetX, y: e.offsetY})
@@ -153,7 +157,7 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 drawPolygon(current.shapes[current.shapes.length-1], null)
             }
         }
-    } else {
+    } else if (current.isCreating) {
         current.start = {x: e.offsetX, y: e.offsetY}
         if (document.getElementById("line-shape").classList.contains("active")) {
             current.isDrawing = true;
@@ -188,20 +192,24 @@ document.getElementById("canvas").addEventListener("click", function(e) {
             }
             current.shapes.push(polygon)
             drawPolygon(polygon, null)
-        } else if (document.getElementById("color-tool").classList.contains("active")) {
-            if (getVertexInsideMouse(e) !== undefined) {
-                const selected = getVertexInsideMouse(e);
-                current.shapes[selected.shapeId].color[selected.vertexId] = document.getElementById("color").value;
-            } else if (getShapeInsideMouse(e) !== undefined) {
-                const selected = getShapeInsideMouse(e);
-                current.shapes[selected].color.forEach((color, index) => {
-                    current.shapes[selected].color[index] = document.getElementById("color").value;
-                });
-                current.shapes[selected].isFilled = true;
-            }
-            refreshCanvas();
-            drawAllVertex(true);
+        } 
+        current.isCreating = false
+    } else if (document.getElementById("color-tool").classList.contains("active")) {
+        if (getVertexInsideMouse(e) !== undefined) {
+            const selected = getVertexInsideMouse(e);
+            current.shapes[selected.shapeId].color[selected.vertexId] = document.getElementById("color").value;
+        } else if (getShapeInsideMouse(e) !== undefined) {
+            const selected = getShapeInsideMouse(e);
+            current.shapes[selected].color.forEach((color, index) => {
+                current.shapes[selected].color[index] = document.getElementById("color").value;
+            });
+            current.shapes[selected].isFilled = true;
         }
+        refreshCanvas();
+        drawAllVertex(true);
+    // select shape
+    } else {
+        current.selectedShapeId = getShapeInsideMouse(e);
     }
 });
 document.getElementById("canvas").addEventListener("mousedown", function(e) {
@@ -215,6 +223,8 @@ document.getElementById("canvas").addEventListener("mousedown", function(e) {
         }
         current.selectedShapeId = dragged.shapeId;
         current.selectedVertexId = dragged.vertexId;
+    } else if (document.getElementById("move-tool").classList.contains("active")) {
+        current.selectedShapeId = getShapeInsideMouse(e);
     }
 });
 
@@ -254,7 +264,6 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
             }
             drawRectangle(rectangle);
         } else if (document.getElementById("polygon-shape").classList.contains("active") && current.isDrawingPolygon) {
-            console.log("asa")
             refreshCanvas();
             const currentShapeIndex = current.shapes.length-1
             var polygon = {
@@ -315,3 +324,9 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
         }
     }
 });
+
+document.getElementById("rotation_angle").addEventListener("change", function(e) {
+    const newTheta = document.getElementById("rotation_angle").value
+    onChangeRotationAngle(current.selectedShapeId, newTheta)
+    refreshCanvas()
+})

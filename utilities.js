@@ -57,6 +57,7 @@ function getShapeInsideMouse(event) {
             const distance = Math.abs(y - slope * x - yIntercept) /
                             Math.sqrt(slope * slope + 1);
             if (distance <= 10) {
+                document.getElementById("rotation_angle").value = current.shapes[i].theta
                 return i;
             }
         } else { // check if the point is inside a polygon
@@ -74,6 +75,7 @@ function getShapeInsideMouse(event) {
                 j = k;
             }
             if (inside) {
+                document.getElementById("rotation_angle").value = current.shapes[i].theta
                 return i;
             }
         }
@@ -97,4 +99,79 @@ function calculateSquareVertices(start, end) {
         newEnd,
         {x: start.x, y: newEnd.y}
     ]);
+}
+
+function onChangeRotationAngle(shapeId, newTheta) {
+    center = getCenter(shapeId)
+    shape = current.shapes[shapeId]
+    size = shape.vertex.length
+    prevTheta = shape.theta
+    diffTheta = newTheta - prevTheta
+    radian = (Math.PI / 180) * diffTheta
+
+    cx = center.x
+    cy = center.y
+
+    cos = Math.cos(radian)
+    sin = Math.sin(radian)
+
+
+    // for (let vertex of shape.vertex) {
+    //     x = cx - vertex.x
+    //     y = cy - vertex.y
+    //     vertex.x = (cos * x) - (sin * y) + cx
+    //     vertex.y = (cos * y) + (sin * x) + cy;
+    // }
+
+
+
+    for (let i=0; i< shape.vertex.length ; i++) {
+        x = cx - shape.vertex[i].x
+        y = cy - shape.vertex[i].y
+        current.shapes[shapeId].vertex[i].x = (cos * x) - (sin * y) + cx
+        current.shapes[shapeId].vertex[i].y = (cos * y) + (sin * x) + cy;
+    }
+
+    current.shapes[shapeId].theta = newTheta
+
+}
+
+function getCenter(shapeId) {
+    shape = current.shapes[shapeId]
+    type = shape.type
+
+    if (type == "line" ) {
+        x0 = shape.vertex[0].x
+        x1 = shape.vertex[1].x
+        y0 = shape.vertex[0].y
+        y1 = shape.vertex[1].y
+        x = (x0 + x1)/2 
+        y = (y0 + y1)/2
+    } else if (type == "square" || type == "rectangle") {
+        minX = shape.vertex[0].x
+        maxX = shape.vertex[0].x
+        minY = shape.vertex[0].y
+        maxY = shape.vertex[0].y
+        for (let vertex of shape.vertex) {
+            minX = vertex.x < minX? vertex.x : minX
+            minY = vertex.y < minY? vertex.y : minY
+            maxX = vertex.x > maxX? vertex.x : maxX
+            maxY = vertex.y > maxY? vertex.y : maxY
+        }
+        x = (minX + maxX) / 2
+        y = (minY + maxY) / 2
+        
+    } else {
+        sumX = 0
+        sumY = 0
+        
+        for (let vertex of shape.vertex) {
+            sumX += vertex.x
+            sumY += vertex.y
+        }
+        x = sumX / shape.vertex.length
+        y = sumY / shape.vertex.length
+    }
+
+    return {x: x, y: y}
 }

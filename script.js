@@ -122,8 +122,6 @@ function drawPolygon(oldPolygon, newVertex) {
         size++;
     }
 
-    console.log(size);
-    console.log(vertices)
     const vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
