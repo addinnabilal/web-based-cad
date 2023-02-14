@@ -82,7 +82,6 @@ function getShapeInsideMouse(event) {
             var inside = false;
             var k = 0, j = shape.vertex.length - 1;
             for (k, j; k < shape.vertex.length; j = k++) {
-                console.log(inside)
                 if ( (shape.vertex[k].y > y) != (shape.vertex[j].y > y) &&
                         x < (shape.vertex[j].x - shape.vertex[k].x) * (y - shape.vertex[k].y) / (shape.vertex[j].y - shape.vertex[k].y) + shape.vertex[k].x ) {
                     inside = !inside;

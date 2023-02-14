@@ -25,6 +25,13 @@ function drawAllVertex(colored = false) {
         }
     });
 }
+
+function drawPolygonVertex(selectedShapeId) {
+    refreshCanvas()
+    current.shapes[selectedShapeId].vertex.forEach( vertex => {
+        drawVertex(vertex);
+    })
+}
 function drawLine(line) {
     const start = convertToWebGLCoordinate(line.vertex[0].x, line.vertex[0].y);
     const end = convertToWebGLCoordinate(line.vertex[1].x, line.vertex[1].y);

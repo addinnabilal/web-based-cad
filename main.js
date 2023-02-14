@@ -83,6 +83,14 @@ document.querySelectorAll("button").forEach(function(element) {
                     drawAllVertex(true);
                     document.getElementById("canvas").style.cursor = "pointer";
                     break;
+                case "delete-polygon-vertex-tool":
+                    drawPolygonVertex(current.selectedShapeId)
+                    document.getElementById("canvas").style.cursor = "pointer";
+                    break;
+                case "add-polygon-vertex-tool":
+                    drawPolygonVertex(current.selectedShapeId)
+                    document.getElementById("canvas").style.cursor = "crosshair";
+                    break;
                 default:
                     break;
             }
@@ -91,7 +99,10 @@ document.querySelectorAll("button").forEach(function(element) {
         }
         current.isDrawing = false;
         this.classList.toggle("active");
-        if (!document.getElementById("resize-tool").classList.contains("active") && !document.getElementById("color-tool").classList.contains("active")) {
+        if (!document.getElementById("resize-tool").classList.contains("active")
+            && !document.getElementById("color-tool").classList.contains("active")
+            && !document.getElementById("delete-polygon-vertex-tool").classList.contains("active")
+            && !document.getElementById("add-polygon-vertex-tool").classList.contains("active")) {
             refreshCanvas();
         }
     })
@@ -110,8 +121,9 @@ document.getElementById("canvas").addEventListener("contextmenu", function(e) {
     e.preventDefault()
     if  (document.getElementById("polygon-shape").classList.contains("active")) {
         current.isDrawingPolygon = false;
-        drawPolygon(current.shapes[current.shapes.length-1], null)
+        drawPolygon(current.shapes[current.shapes.length-1])
         current.isDrawing = false
+        document.getElementById("canvas").style.cursor = "default";
 
     }
 })
@@ -120,43 +132,48 @@ document.getElementById("canvas").addEventListener("contextmenu", function(e) {
 // Canvas click event based on active tools
 document.getElementById("canvas").addEventListener("click", function(e) {
     if (current.isDrawing) {
-        current.isDrawing = false;
-        if (document.getElementById("line-shape").classList.contains("active")) {
-            current.shapes.push({type: "line", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value], theta: 0});
-        } else if (document.getElementById("square-shape").classList.contains("active")) {
-            const start = current.start;
-            const end = {x: e.offsetX, y: e.offsetY};            
-            current.shapes.push({
-                type: "square", 
-                vertex: calculateSquareVertices(start, end), 
-                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
-                isFilled: false,
-                theta: 0
-            });
-        } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
-            current.shapes.push({
-                type: "rectangle", 
-                vertex: [
-                    current.start, 
-                    {x: e.offsetX, y: current.start.y},
-                    {x: e.offsetX, y: e.offsetY},
-                    {x: current.start.x, y: e.offsetY}
-                ], 
-                color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
-                isFilled: false,
-                theta: 0
-            });
-        } else if (document.getElementById("polygon-shape").classList.contains("active")) {
-            current.isDrawing = true;
+        if (document.getElementById("polygon-shape").classList.contains("active")) {
             if (!current.isDrawingPolygon) {
                 current.shapes.push({type: "polygon", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value], theta: 0});
                 current.isDrawingPolygon = true;
             } else {
                 current.shapes[current.shapes.length-1].vertex.push({x: e.offsetX, y: e.offsetY})
                 current.shapes[current.shapes.length-1].color.push(document.getElementById("color").value)
-                drawPolygon(current.shapes[current.shapes.length-1], null)
+                drawPolygon(current.shapes[current.shapes.length-1])
             }
+        } else {
+            current.isDrawing = false;
+            document.getElementById("canvas").style.cursor = "default";
+            if (document.getElementById("line-shape").classList.contains("active")) {
+                current.shapes.push({type: "line", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value], theta: 0});
+            } else if (document.getElementById("square-shape").classList.contains("active")) {
+                const start = current.start;
+                const end = {x: e.offsetX, y: e.offsetY};            
+                current.shapes.push({
+                    type: "square", 
+                    vertex: calculateSquareVertices(start, end), 
+                    color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
+                    isFilled: false,
+                    theta: 0
+                });
+                current.isDrawing = false;
+                document.getElementById("canvas").style.cursor = "default";
+            } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
+                current.shapes.push({
+                    type: "rectangle", 
+                    vertex: [
+                        current.start, 
+                        {x: e.offsetX, y: current.start.y},
+                        {x: e.offsetX, y: e.offsetY},
+                        {x: current.start.x, y: e.offsetY}
+                    ], 
+                    color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
+                    isFilled: false,
+                    theta: 0
+                });
+            } 
         }
+
     } else if (current.isCreating) {
         current.start = {x: e.offsetX, y: e.offsetY}
         if (document.getElementById("line-shape").classList.contains("active")) {
@@ -192,7 +209,7 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 theta: 0
             }
             current.shapes.push(polygon)
-            drawPolygon(polygon, null)
+            drawPolygon(polygon)
         } 
         current.isCreating = false
     } else if (document.getElementById("color-tool").classList.contains("active")) {
@@ -208,6 +225,21 @@ document.getElementById("canvas").addEventListener("click", function(e) {
         }
         refreshCanvas();
         drawAllVertex(true);
+    } else if (document.getElementById("delete-polygon-vertex-tool").classList.contains("active")) {
+        if (getVertexInsideMouse(e) !== undefined) {
+            const selected = getVertexInsideMouse(e);
+            if ( current.shapes[selected.shapeId].vertex.length >3) {
+                current.shapes[selected.shapeId].vertex.splice([selected.vertexId], 1)
+            }
+        } 
+        refreshCanvas();
+        drawPolygonVertex(current.selectedShapeId);
+    } else if (document.getElementById("add-polygon-vertex-tool").classList.contains("active")) {
+        current.shapes[current.selectedShapeId].vertex.push({x: e.offsetX, y: e.offsetY})
+        current.shapes[current.selectedShapeId].color.push(document.getElementById("color").value)
+        drawPolygon(current.shapes[current.shapes.length-1])
+        refreshCanvas();
+        drawPolygonVertex(current.selectedShapeId)
     // select shape
     } else {
         current.selectedShapeId = getShapeInsideMouse(e);
@@ -279,7 +311,7 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
             // }
             polygon.vertex[currentShapeIndex-1] = {x: e.offsetX, y: e.offsetY}
             polygon.color[currentShapeIndex-1] = document.getElementById("color").value
-            drawPolygon(polygon, null)
+            drawPolygon(polygon)
         }
     } else if (current.isDragging) {
         if (document.getElementById("move-tool").classList.contains("active")) {
