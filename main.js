@@ -1,5 +1,4 @@
-
-const current = {
+var current = {
     shapes : [],    // {vertex: [{x: 0, y: 0}, {x: 0, y: 0}], color: [#000000, #000000], theta: 250} (Length of vertex and color is according to the shape)
     isDrawing : false,   
     isCreating: false, 
@@ -64,12 +63,14 @@ main();
 document.querySelectorAll("button").forEach(function(element) {
     element.addEventListener("click", function() {
         document.getElementById("canvas").style.cursor = "default";
+        current.isCreating = false;
         if (!this.classList.contains("active")) {
             switch (this.id) {
                 case "line-shape":
                 case "square-shape":
                 case "rectangle-shape":
                 case "polygon-shape":
+                    current.isCreating = true;
                     document.getElementById("canvas").style.cursor = "crosshair";
                     break;
                 case "move-tool":
@@ -95,7 +96,6 @@ document.querySelectorAll("button").forEach(function(element) {
                     break;
             }
             disableAllButtons();
-            current.isCreating = true;
         }
         current.isDrawing = false;
         this.classList.toggle("active");
@@ -117,17 +117,6 @@ document.getElementById("clear").addEventListener("click", function() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 });
 
-document.getElementById("canvas").addEventListener("contextmenu", function(e) {
-    e.preventDefault()
-    if  (document.getElementById("polygon-shape").classList.contains("active")) {
-        current.isDrawingPolygon = false;
-        drawPolygon(current.shapes[current.shapes.length-1])
-        current.isDrawing = false
-        document.getElementById("canvas").style.cursor = "default";
-
-    }
-})
-
 
 // Canvas click event based on active tools
 document.getElementById("canvas").addEventListener("click", function(e) {
@@ -143,7 +132,6 @@ document.getElementById("canvas").addEventListener("click", function(e) {
             }
         } else {
             current.isDrawing = false;
-            document.getElementById("canvas").style.cursor = "default";
             if (document.getElementById("line-shape").classList.contains("active")) {
                 current.shapes.push({type: "line", vertex: [current.start, {x: e.offsetX, y: e.offsetY}], color: [document.getElementById("color").value, document.getElementById("color").value], theta: 0});
             } else if (document.getElementById("square-shape").classList.contains("active")) {
@@ -157,7 +145,6 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                     theta: 0
                 });
                 current.isDrawing = false;
-                document.getElementById("canvas").style.cursor = "default";
             } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
                 current.shapes.push({
                     type: "rectangle", 
@@ -210,8 +197,7 @@ document.getElementById("canvas").addEventListener("click", function(e) {
             }
             current.shapes.push(polygon)
             drawPolygon(polygon)
-        } 
-        current.isCreating = false
+        }
     } else if (document.getElementById("color-tool").classList.contains("active")) {
         if (getVertexInsideMouse(e) !== undefined) {
             const selected = getVertexInsideMouse(e);
@@ -245,6 +231,7 @@ document.getElementById("canvas").addEventListener("click", function(e) {
         current.selectedShapeId = getShapeInsideMouse(e);
     }
 });
+
 document.getElementById("canvas").addEventListener("mousedown", function(e) {
     current.isDragging = true;
     if (document.getElementById("move-tool").classList.contains("active")) {
@@ -265,6 +252,18 @@ document.getElementById("canvas").addEventListener("mouseup", function(e) {
     current.isDragging = false;
 });
 
+document.getElementById("canvas").addEventListener("contextmenu", function(e) {
+    e.preventDefault()
+    if  (document.getElementById("polygon-shape").classList.contains("active")) {
+        if (current.shapes[current.shapes.length-1].vertex.length <= 2) {
+            current.shapes.pop();
+        }
+        current.isDrawingPolygon = false;
+        drawPolygon(current.shapes[current.shapes.length-1])
+        current.isDrawing = false
+        refreshCanvas();
+    }
+})
 
 document.getElementById("canvas").addEventListener("mousemove", function(e) {
     if (current.isDrawing) {
@@ -309,8 +308,8 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
             //     vertex: {x: e.offsetX, y: e.offsetY},
             //     color: document.getElementById("color").value
             // }
-            polygon.vertex[currentShapeIndex-1] = {x: e.offsetX, y: e.offsetY}
-            polygon.color[currentShapeIndex-1] = document.getElementById("color").value
+            polygon.vertex[polygonSize-1] = {x: e.offsetX, y: e.offsetY}
+            polygon.color[polygonSize-1] = document.getElementById("color").value
             drawPolygon(polygon)
         }
     } else if (current.isDragging) {
@@ -363,3 +362,37 @@ document.getElementById("rotation_angle").addEventListener("change", function(e)
     onChangeRotationAngle(current.selectedShapeId, newTheta)
     refreshCanvas()
 })
+
+document.getElementById("save").addEventListener("click", function(e) {
+    const data = JSON.stringify(current.shapes);
+    const a = document.createElement("a");
+    const file = new Blob([data], {type: "text/plain"});
+    a.href = URL.createObjectURL(file);
+    a.download = "shapes.json";
+    a.click();
+});
+
+document.getElementById("load").addEventListener("click", function(e) {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json";
+    input.onchange = function() {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            current = {
+                shapes : JSON.parse(e.target.result),
+                isDrawing : false,
+                isCreating: false,
+                isDrawingPolygon : false,
+                isDragging : false,
+                selectedShapeId : null,
+                selectedVertexId : null,
+                start : {x: 0, y: 0}
+            }
+            refreshCanvas();
+        }
+        reader.readAsText(file);
+    }
+    input.click();
+});
