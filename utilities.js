@@ -116,31 +116,17 @@ function calculateSquareVertices(start, end) {
 
 function onChangeRotationAngle(shapeId, newTheta) {
     center = getCenter(shapeId)
-    shape = current.shapes[shapeId]
-    size = shape.vertex.length
-    prevTheta = shape.theta
-    diffTheta = newTheta - prevTheta
-    radian = (Math.PI / 180) * diffTheta
-
-    cx = center.x
-    cy = center.y
-
-    cos = Math.cos(radian)
-    sin = Math.sin(radian)
-
-
-    // for (let vertex of shape.vertex) {
-    //     x = cx - vertex.x
-    //     y = cy - vertex.y
-    //     vertex.x = (cos * x) - (sin * y) + cx
-    //     vertex.y = (cos * y) + (sin * x) + cy;
-    // }
-
-
+    let shape = current.shapes[shapeId]
+    let diffTheta = newTheta - shape.theta
+    let radian = (Math.PI / 180) * diffTheta
+    let cx = center.x
+    let cy = center.y
+    let cos = Math.cos(radian)
+    let sin = Math.sin(radian)
 
     for (let i=0; i< shape.vertex.length ; i++) {
-        x = cx - shape.vertex[i].x
-        y = cy - shape.vertex[i].y
+        x = shape.vertex[i].x - cx
+        y = shape.vertex[i].y - cy
         current.shapes[shapeId].vertex[i].x = (cos * x) - (sin * y) + cx
         current.shapes[shapeId].vertex[i].y = (cos * y) + (sin * x) + cy;
     }

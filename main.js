@@ -97,6 +97,14 @@ document.querySelectorAll("button").forEach(function(element) {
             }
             disableAllButtons();
         }
+        if (this.id !== "move-tool") {
+            document.getElementById("rotation_angle").disabled = true;
+            document.getElementById("add-polygon-vertex-tool").disabled = true;
+            document.getElementById("delete-polygon-vertex-tool").disabled = true;
+        }
+        if (this.id !== "resize-tool") {
+            refreshCanvas();
+        }
         current.isDrawing = false;
         this.classList.toggle("active");
         if (!document.getElementById("resize-tool").classList.contains("active")
@@ -226,6 +234,18 @@ document.getElementById("canvas").addEventListener("mousedown", function(e) {
     current.isDragging = true;
     if (document.getElementById("move-tool").classList.contains("active")) {
         current.selectedShapeId = getShapeInsideMouse(e);
+        if (current.selectedShapeId !== null && current.selectedShapeId !== undefined) {
+            document.getElementById("rotation_angle").disabled = false;
+            if (current.shapes[current.selectedShapeId].type === "polygon") {
+                document.getElementById("add-polygon-vertex-tool").disabled = false;
+                document.getElementById("delete-polygon-vertex-tool").disabled = false;
+            }
+        }
+        else {
+            document.getElementById("rotation_angle").disabled = true;
+            document.getElementById("add-polygon-vertex-tool").disabled = true;
+            document.getElementById("delete-polygon-vertex-tool").disabled = true;
+        }
     } else if (document.getElementById("resize-tool").classList.contains("active")) {
         const dragged = getVertexInsideMouse(e);
         if (dragged === undefined) {
@@ -233,8 +253,6 @@ document.getElementById("canvas").addEventListener("mousedown", function(e) {
         }
         current.selectedShapeId = dragged.shapeId;
         current.selectedVertexId = dragged.vertexId;
-    } else if (document.getElementById("move-tool").classList.contains("active")) {
-        current.selectedShapeId = getShapeInsideMouse(e);
     }
 });
 
@@ -347,10 +365,13 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
     }
 });
 
-document.getElementById("rotation_angle").addEventListener("change", function(e) {
-    const newTheta = document.getElementById("rotation_angle").value
-    onChangeRotationAngle(current.selectedShapeId, newTheta)
-    refreshCanvas()
+document.getElementById("rotation_angle").addEventListener("mousemove", function(e) {
+    if (current.selectedShapeId !== null && current.selectedShapeId !== undefined) {
+        if (current.shapes[current.selectedShapeId].theta !== e.target.value) {
+            onChangeRotationAngle(current.selectedShapeId, e.target.value)
+            refreshCanvas();
+        }
+    }
 })
 
 document.getElementById("save").addEventListener("click", function(e) {
