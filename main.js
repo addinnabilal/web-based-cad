@@ -141,7 +141,6 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                     type: "square", 
                     vertex: calculateSquareVertices(start, end), 
                     color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
-                    isFilled: false,
                     theta: 0
                 });
                 current.isDrawing = false;
@@ -155,7 +154,6 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                         {x: current.start.x, y: e.offsetY}
                     ], 
                     color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
-                    isFilled: false,
                     theta: 0
                 });
             } 
@@ -175,7 +173,6 @@ document.getElementById("canvas").addEventListener("click", function(e) {
             const square = {
                 vertex: [current.start, current.start, current.start, current.start],
                 color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
-                isFilled: false
             }
             drawSquare(square);
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
@@ -183,7 +180,6 @@ document.getElementById("canvas").addEventListener("click", function(e) {
             const rectangle = {
                 vertex: [current.start, current.start, current.start, current.start],
                 color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
-                isFilled: false
             }
             drawRectangle(rectangle);
         } else if (document.getElementById("polygon-shape").classList.contains("active")) {
@@ -202,12 +198,6 @@ document.getElementById("canvas").addEventListener("click", function(e) {
         if (getVertexInsideMouse(e) !== undefined) {
             const selected = getVertexInsideMouse(e);
             current.shapes[selected.shapeId].color[selected.vertexId] = document.getElementById("color").value;
-        } else if (getShapeInsideMouse(e) !== undefined) {
-            const selected = getShapeInsideMouse(e);
-            current.shapes[selected].color.forEach((color, index) => {
-                current.shapes[selected].color[index] = document.getElementById("color").value;
-            });
-            current.shapes[selected].isFilled = true;
         }
         refreshCanvas();
         drawAllVertex(true);

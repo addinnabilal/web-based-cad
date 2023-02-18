@@ -66,8 +66,8 @@ function drawSquare(square) {
     
     const vertices = new Float32Array([
         ver1.x, ver1.y, 0, color1.r, color1.g, color1.b,
-        ver2.x, ver2.y, 0, color2.r, color2.g, color2.b,
         ver3.x, ver3.y, 0, color3.r, color3.g, color3.b,
+        ver2.x, ver2.y, 0, color2.r, color2.g, color2.b,
         ver4.x, ver4.y, 0, color4.r, color4.g, color4.b,
         ver1.x, ver1.y, 0, color1.r, color1.g, color1.b
     ]);
@@ -80,7 +80,7 @@ function drawSquare(square) {
         positionAttributeLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 0);
     gl.vertexAttribPointer(
         colorAttribLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 3*Float32Array.BYTES_PER_ELEMENT);
-    gl.drawArrays(square.isFilled? gl.TRIANGLE_STRIP : gl.LINE_STRIP, 0, 5);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 5);
 }
 
 function drawRectangle(rectangle) {
@@ -96,8 +96,8 @@ function drawRectangle(rectangle) {
 
     const vertices = new Float32Array([
         ver1.x, ver1.y, 0, color1.r, color1.g, color1.b,
-        ver2.x, ver2.y, 0, color2.r, color2.g, color2.b,
         ver3.x, ver3.y, 0, color3.r, color3.g, color3.b,
+        ver2.x, ver2.y, 0, color2.r, color2.g, color2.b,
         ver4.x, ver4.y, 0, color4.r, color4.g, color4.b,
         ver1.x, ver1.y, 0, color1.r, color1.g, color1.b
     ]);
@@ -110,7 +110,7 @@ function drawRectangle(rectangle) {
         positionAttributeLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 0);
     gl.vertexAttribPointer(
         colorAttribLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 3*Float32Array.BYTES_PER_ELEMENT);
-    gl.drawArrays(rectangle.isFilled? gl.TRIANGLE_STRIP : gl.LINE_STRIP, 0, 5);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 5);
 }
 
 function drawPolygon(oldPolygon, newVertex) {
