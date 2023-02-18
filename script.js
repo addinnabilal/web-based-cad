@@ -26,7 +26,7 @@ function drawAllVertex(colored = false) {
     });
 }
 
-function drawPolygonVertex(selectedShapeId) {
+function drawShapeVertex(selectedShapeId) {
     refreshCanvas()
     current.shapes[selectedShapeId].vertex.forEach( vertex => {
         drawVertex(vertex);
