@@ -130,7 +130,6 @@ function onChangeRotationAngle(shapeId, newTheta) {
         current.shapes[shapeId].vertex[i].x = (cos * x) - (sin * y) + cx
         current.shapes[shapeId].vertex[i].y = (cos * y) + (sin * x) + cy;
     }
-
     current.shapes[shapeId].theta = newTheta
 
 }
@@ -173,4 +172,23 @@ function getCenter(shapeId) {
     }
 
     return {x: x, y: y}
+}
+
+function animate(shapeId) {
+    let oldTheta = current.shapes[shapeId].theta;
+    let newTheta = oldTheta
+    let intervalId = setInterval(function() {
+
+        newTheta += 5;
+
+        if (newTheta >= 360) {
+            newTheta -= 360;
+        }
+        onChangeRotationAngle(shapeId, newTheta);
+        refreshCanvas();
+
+        if (newTheta === oldTheta) {
+            clearInterval(intervalId);
+        }
+    }, 30); // run every 0.2 seconds (200 milliseconds)
 }

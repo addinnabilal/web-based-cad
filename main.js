@@ -107,12 +107,14 @@ document.querySelectorAll("button").forEach(function(element) {
             document.getElementById("rotation_angle").disabled = true;
             document.getElementById("add-polygon-vertex-tool").disabled = true;
             document.getElementById("delete-polygon-vertex-tool").disabled = true;
+            document.getElementById("animate-tool").disabled = true;
         }
 
         if (!document.getElementById("resize-tool").classList.contains("active")
                 && !document.getElementById("color-tool").classList.contains("active")
                 && !document.getElementById("delete-polygon-vertex-tool").classList.contains("active")
-                && !document.getElementById("add-polygon-vertex-tool").classList.contains("active")) {
+                && !document.getElementById("add-polygon-vertex-tool").classList.contains("active")
+                && !document.getElementById("animate-tool").classList.contains("active")) {
             refreshCanvas();
         }
     })
@@ -238,6 +240,7 @@ document.getElementById("canvas").addEventListener("mousedown", function(e) {
         current.selectedShapeId = getShapeInsideMouse(e);
         if (current.selectedShapeId !== null && current.selectedShapeId !== undefined) {
             document.getElementById("rotation_angle").disabled = false;
+            document.getElementById("animate-tool").disabled = false;
             if (current.shapes[current.selectedShapeId].type === "polygon") {
                 document.getElementById("add-polygon-vertex-tool").disabled = false;
                 document.getElementById("delete-polygon-vertex-tool").disabled = false;
@@ -247,6 +250,8 @@ document.getElementById("canvas").addEventListener("mousedown", function(e) {
             document.getElementById("rotation_angle").disabled = true;
             document.getElementById("add-polygon-vertex-tool").disabled = true;
             document.getElementById("delete-polygon-vertex-tool").disabled = true;
+            document.getElementById("animate-tool").disabled = true;
+
         }
         drawShapeVertex(current.selectedShapeId)
     } else if (document.getElementById("resize-tool").classList.contains("active")) {
@@ -382,6 +387,7 @@ document.getElementById("rotation_angle").addEventListener("mousemove", function
     }
 })
 
+
 document.getElementById("save").addEventListener("click", function(e) {
     const data = JSON.stringify(current.shapes);
     const a = document.createElement("a");
@@ -414,4 +420,11 @@ document.getElementById("load").addEventListener("click", function(e) {
         reader.readAsText(file);
     }
     input.click();
+});
+
+document.getElementById("animate-tool").addEventListener("click", function(e) {
+    if (current.selectedShapeId !== null && current.selectedShapeId !== undefined) {
+        animate(current.selectedShapeId)
+
+    }
 });
