@@ -357,8 +357,20 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += delta;
                     }
                 } else if (current.shapes[current.selectedShapeId].type === "rectangle") {
+                    // rotate back to the original position
+                    const theta = current.shapes[current.selectedShapeId].theta;
+                    const cx = current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+2)%4].x
+                    const cy = current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+2)%4].y
+                    const center = {x: cx, y: cy}
+                    onChangeRotationAngle(current.selectedShapeId, 0);
                     current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
                     current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
+                    // calculate the other vertex accounting for the rotation
+                    // const theta = current.shapes[current.selectedShapeId].theta;
+                    // const radian = theta * Math.PI / 180;
+                    
+
+
                     if (current.selectedVertexId % 2 === 1) {
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += e.movementX;
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y += e.movementY;
@@ -366,6 +378,8 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += e.movementY;
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += e.movementX;
                     }
+
+                    onChangeRotationAngle(current.selectedShapeId, theta);
                 } else {
                     current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
                     current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
