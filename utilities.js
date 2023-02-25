@@ -188,5 +188,5 @@ function animate(shapeId) {
         if (newTheta === oldTheta) {
             clearInterval(intervalId);
         }
-    }, 30); // run every 0.2 seconds (200 milliseconds)
+    }, 20); // run every 0.02 seconds (20 milliseconds)
 }

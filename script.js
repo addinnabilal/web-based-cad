@@ -78,7 +78,7 @@ function drawRectangle(rectangle) {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 5);
 }
 
-function drawPolygon(oldPolygon, newVertex) {
+function drawPolygon(oldPolygon) {
     var vertices = [];
     var size = oldPolygon.vertex.length
 
@@ -86,12 +86,6 @@ function drawPolygon(oldPolygon, newVertex) {
         convertedVertex = convertToWebGLCoordinate(oldPolygon.vertex[i].x, oldPolygon.vertex[i].y)
         const color = hexToRGBColor(oldPolygon.color[i]);
         vertices.push(convertedVertex.x, convertedVertex.y, 0, color.r, color.g, color.b)
-    }
-    if (newVertex) {
-        convertedVertex = convertToWebGLCoordinate(newVertex.vertex.x, newVertex.vertex.y)
-        const color = hexToRGBColor(newVertex.color)
-        vertices.push(convertedVertex.x, convertedVertex.y, 0, color.r, color.g, color.b)
-        size++;
     }
 
     const vertexBuffer = gl.createBuffer();
@@ -103,5 +97,5 @@ function drawPolygon(oldPolygon, newVertex) {
         positionAttributeLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 0);
     gl.vertexAttribPointer(
         colorAttribLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 3*Float32Array.BYTES_PER_ELEMENT);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, size);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, size);
 }
