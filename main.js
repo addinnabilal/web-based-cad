@@ -344,6 +344,11 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
         } else if (document.getElementById("resize-tool").classList.contains("active")) {
             if (current.selectedShapeId !== undefined && current.selectedVertexId !== undefined) {
                 if (current.shapes[current.selectedShapeId].type === "square") {
+                    // Store theta for later rotation
+                    const theta = current.shapes[current.selectedShapeId].theta;
+                    // Rotate back to 0
+                    onChangeRotationAngle(current.selectedShapeId, 0);
+                    // Resize
                     const delta = Math.abs(e.movementX) > Math.abs(e.movementY) ? e.movementX : e.movementY;
                     if (current.selectedVertexId % 2 === 1) {
                         current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += delta;
@@ -356,6 +361,8 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += delta;
                         current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += delta;
                     }
+                    // Rotate back to original theta
+                    onChangeRotationAngle(current.selectedShapeId, theta);
                 } else if (current.shapes[current.selectedShapeId].type === "rectangle") {
                     // rotate back to the original position
                     const theta = current.shapes[current.selectedShapeId].theta;
