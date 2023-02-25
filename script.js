@@ -53,35 +53,35 @@ function drawLine(line) {
     gl.drawArrays(gl.LINES, 0, 2);
 }
 
-function drawSquare(square) {
-    const ver1 = convertToWebGLCoordinate(square.vertex[0].x, square.vertex[0].y);
-    const ver2 = convertToWebGLCoordinate(square.vertex[1].x, square.vertex[1].y);
-    const ver3 = convertToWebGLCoordinate(square.vertex[2].x, square.vertex[2].y);
-    const ver4 = convertToWebGLCoordinate(square.vertex[3].x, square.vertex[3].y);
+// function drawSquare(square) {
+//     const ver1 = convertToWebGLCoordinate(square.vertex[0].x, square.vertex[0].y);
+//     const ver2 = convertToWebGLCoordinate(square.vertex[1].x, square.vertex[1].y);
+//     const ver3 = convertToWebGLCoordinate(square.vertex[2].x, square.vertex[2].y);
+//     const ver4 = convertToWebGLCoordinate(square.vertex[3].x, square.vertex[3].y);
     
-    const color1 = hexToRGBColor(square.color[0]);
-    const color2 = hexToRGBColor(square.color[1]);
-    const color3 = hexToRGBColor(square.color[2]);
-    const color4 = hexToRGBColor(square.color[3]);
+//     const color1 = hexToRGBColor(square.color[0]);
+//     const color2 = hexToRGBColor(square.color[1]);
+//     const color3 = hexToRGBColor(square.color[2]);
+//     const color4 = hexToRGBColor(square.color[3]);
     
-    const vertices = new Float32Array([
-        ver1.x, ver1.y, 0, color1.r, color1.g, color1.b,
-        ver3.x, ver3.y, 0, color3.r, color3.g, color3.b,
-        ver2.x, ver2.y, 0, color2.r, color2.g, color2.b,
-        ver4.x, ver4.y, 0, color4.r, color4.g, color4.b,
-        ver1.x, ver1.y, 0, color1.r, color1.g, color1.b
-    ]);
-    const vertexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(positionAttributeLocation);
-    gl.enableVertexAttribArray(colorAttribLocation);
-    gl.vertexAttribPointer(
-        positionAttributeLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 0);
-    gl.vertexAttribPointer(
-        colorAttribLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 3*Float32Array.BYTES_PER_ELEMENT);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 5);
-}
+//     const vertices = new Float32Array([
+//         ver1.x, ver1.y, 0, color1.r, color1.g, color1.b,
+//         ver3.x, ver3.y, 0, color3.r, color3.g, color3.b,
+//         ver2.x, ver2.y, 0, color2.r, color2.g, color2.b,
+//         ver4.x, ver4.y, 0, color4.r, color4.g, color4.b,
+//         ver1.x, ver1.y, 0, color1.r, color1.g, color1.b
+//     ]);
+//     const vertexBuffer = gl.createBuffer();
+//     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+//     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+//     gl.enableVertexAttribArray(positionAttributeLocation);
+//     gl.enableVertexAttribArray(colorAttribLocation);
+//     gl.vertexAttribPointer(
+//         positionAttributeLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 0);
+//     gl.vertexAttribPointer(
+//         colorAttribLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 3*Float32Array.BYTES_PER_ELEMENT);
+//     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 5);
+// }
 
 function drawRectangle(rectangle) {
     const ver1 = convertToWebGLCoordinate(rectangle.vertex[0].x, rectangle.vertex[0].y);

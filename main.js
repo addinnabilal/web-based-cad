@@ -186,7 +186,7 @@ document.getElementById("canvas").addEventListener("click", function(e) {
                 vertex: [current.start, current.start, current.start, current.start],
                 color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value],
             }
-            drawSquare(square);
+            drawRectangle(square);
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
             current.isDrawing = true;
             const rectangle = {
@@ -301,7 +301,7 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
                 vertex: calculateSquareVertices(start, end),
                 color: [document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value, document.getElementById("color").value]
             }
-            drawSquare(square);
+            drawRectangle(square);
         } else if (document.getElementById("rectangle-shape").classList.contains("active")) {
             refreshCanvas();
             const rectangle = {
