@@ -61,6 +61,10 @@ main();
 
 // Tools activation onclick
 document.querySelectorAll("button").forEach(function(element) {
+    if (element.id === "resize-width" || element.id === "resize-height") {
+        element.disabled = true;
+        return
+    }
     element.addEventListener("click", function() {
         document.getElementById("canvas").style.cursor = "default";
         current.isCreating = false;
@@ -108,6 +112,8 @@ document.querySelectorAll("button").forEach(function(element) {
             document.getElementById("add-polygon-vertex-tool").disabled = true;
             document.getElementById("delete-polygon-vertex-tool").disabled = true;
             document.getElementById("animate-tool").disabled = true;
+            document.getElementById("resize-width").disabled = true;
+            document.getElementById("resize-height").disabled = true;
         }
 
         if (!document.getElementById("resize-tool").classList.contains("active")
@@ -119,6 +125,14 @@ document.querySelectorAll("button").forEach(function(element) {
         }
     })
 });
+document.getElementById("resize-width").addEventListener("click", function() {
+    this.classList.toggle("active");
+    document.getElementById("resize-height").classList.remove("active");
+})
+document.getElementById("resize-height").addEventListener("click", function() {
+    this.classList.toggle("active");
+    document.getElementById("resize-width").classList.remove("active");
+})
 document.getElementById("canvas-color").addEventListener("change", function() {
     document.getElementById("canvas").style.backgroundColor = this.value;
 });
@@ -255,6 +269,11 @@ document.getElementById("canvas").addEventListener("mousedown", function(e) {
         }
         drawShapeVertex(current.selectedShapeId)
     } else if (document.getElementById("resize-tool").classList.contains("active")) {
+        const currentShape = getShapeInsideMouse(e);
+        if (currentShape !== undefined && current.shapes[currentShape].type === "rectangle") {
+            document.getElementById("resize-width").disabled = false;
+            document.getElementById("resize-height").disabled = false;
+        }
         const dragged = getVertexInsideMouse(e);
         if (dragged === undefined) {
             return;
@@ -364,28 +383,45 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
                     // Rotate back to original theta
                     onChangeRotationAngle(current.selectedShapeId, theta);
                 } else if (current.shapes[current.selectedShapeId].type === "rectangle") {
-                    // rotate back to the original position
+                    // Store theta for later rotation
                     const theta = current.shapes[current.selectedShapeId].theta;
-                    const cx = current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+2)%4].x
-                    const cy = current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+2)%4].y
-                    const center = {x: cx, y: cy}
+                    // Rotate back to 0
+                    // const cx = current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+2)%4].x
+                    // const cy = current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+2)%4].y
+                    // const center = {x: cx, y: cy}
                     onChangeRotationAngle(current.selectedShapeId, 0);
-                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
-                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
-                    // calculate the other vertex accounting for the rotation
-                    // const theta = current.shapes[current.selectedShapeId].theta;
-                    // const radian = theta * Math.PI / 180;
-                    
+                    // Resize
+                    // Resize width only
+                    if (document.getElementById("resize-width").classList.contains("active")) {
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
+                        if (current.selectedVertexId % 2 === 1) {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += e.movementX;
+                        } else {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += e.movementX;
+                        }
 
+                    // Resize height only
+                    } else if (document.getElementById("resize-height").classList.contains("active")) {
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
+                        if (current.selectedVertexId % 2 === 1) {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y += e.movementY;
+                        } else {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += e.movementY;
+                        }
 
-                    if (current.selectedVertexId % 2 === 1) {
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += e.movementX;
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y += e.movementY;
+                    // Resize both width and height
                     } else {
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += e.movementY;
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += e.movementX;
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
+                        if (current.selectedVertexId % 2 === 1) {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += e.movementX;
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y += e.movementY;
+                        } else {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += e.movementY;
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += e.movementX;
+                        }
                     }
-
+                    // Rotate back to original theta
                     onChangeRotationAngle(current.selectedShapeId, theta);
                 } else {
                     current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
