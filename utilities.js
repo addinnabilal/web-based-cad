@@ -22,9 +22,7 @@ function refreshCanvas() {
     current.shapes.forEach(function(shape) {
         if (shape.type === "line") {
             drawLine(shape);
-        } else if (shape.type === "square") {
-            drawSquare(shape);
-        } else if (shape.type === "rectangle") {
+        } else if (shape.type === "rectangle" || shape.type === "square") {
             drawRectangle(shape);
         } else if (shape.type === "polygon") {
             drawPolygon(shape, null);
