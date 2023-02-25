@@ -224,6 +224,9 @@ document.getElementById("canvas").addEventListener("click", function(e) {
         if (getVertexInsideMouse(e) !== undefined) {
             const selected = getVertexInsideMouse(e);
             current.shapes[selected.shapeId].color[selected.vertexId] = document.getElementById("color").value;
+        } else if (getShapeInsideMouse(e) !== undefined) {
+            const selected = getShapeInsideMouse(e);
+            current.shapes[selected].color = current.shapes[selected].color.map(() => document.getElementById("color").value);
         }
         refreshCanvas();
         drawAllVertex(true);
