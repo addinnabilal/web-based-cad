@@ -225,8 +225,7 @@ document.getElementById("canvas").addEventListener("click", function(e) {
     } else if (document.getElementById("add-polygon-vertex-tool").classList.contains("active")) {
         current.shapes[current.selectedShapeId].vertex.push({x: e.offsetX, y: e.offsetY})
         current.shapes[current.selectedShapeId].color.push(document.getElementById("color").value)
-        drawPolygon(current.shapes[current.shapes.length-1])
-        refreshCanvas();
+        drawPolygon(current.shapes[current.selectedShapeId])
         drawShapeVertex(current.selectedShapeId)
     // select shape
     } else {
