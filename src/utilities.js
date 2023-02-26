@@ -188,8 +188,8 @@ function animate(shapeId) {
         onChangeRotationAngle(shapeId, newTheta);
         refreshCanvas();
 
-        if (newTheta === oldTheta) {
+        if (newTheta === oldTheta || (oldTheta == 360 && newTheta == 0)) {
             clearInterval(intervalId);
-        }
+        } 
     }, 20); // run every 0.02 seconds (20 milliseconds)
 }
