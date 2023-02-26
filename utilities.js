@@ -173,7 +173,7 @@ function getCenter(shapeId) {
 }
 
 function animate(shapeId) {
-    let oldTheta = current.shapes[shapeId].theta;
+    let oldTheta = parseInt(current.shapes[shapeId].theta) ;
     let newTheta = oldTheta
     let intervalId = setInterval(function() {
 
