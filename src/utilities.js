@@ -28,6 +28,9 @@ function refreshCanvas() {
             drawPolygon(shape, null);
         }
     });
+    if (document.getElementById("canvas").style.backgroundColor !== current.backgroundColor) {
+        document.getElementById("canvas").style.backgroundColor = current.backgroundColor;
+    }
 }
 function getVertexInsideMouse(event) {
     var x = event.offsetX;

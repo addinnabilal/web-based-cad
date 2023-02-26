@@ -7,6 +7,7 @@ var current = {
     selectedShapeId : null,
     selectedVertexId : null,
     start : {x: 0, y: 0},
+    backgroundColor : "#FFFFFF",
 };
 const canvas = document.getElementById("canvas");
 const gl = canvas.getContext("webgl");
@@ -61,6 +62,10 @@ main();
 
 // Tools activation onclick
 document.querySelectorAll("button").forEach(function(element) {
+    if (element.id === "resize-width" || element.id === "resize-height") {
+        element.disabled = true;
+        return
+    }
     element.addEventListener("click", function() {
         document.getElementById("canvas").style.cursor = "default";
         current.isCreating = false;
@@ -103,11 +108,19 @@ document.querySelectorAll("button").forEach(function(element) {
 
         if (!document.getElementById("move-tool").classList.contains("active")
                 && !document.getElementById("delete-polygon-vertex-tool").classList.contains("active")
-                && !document.getElementById("add-polygon-vertex-tool").classList.contains("active")) {
+                && !document.getElementById("add-polygon-vertex-tool").classList.contains("active")
+                && !document.getElementById("animate-tool").classList.contains("active")) {
             document.getElementById("rotation_angle").disabled = true;
             document.getElementById("add-polygon-vertex-tool").disabled = true;
             document.getElementById("delete-polygon-vertex-tool").disabled = true;
             document.getElementById("animate-tool").disabled = true;
+        }
+
+        if (!document.getElementById("resize-tool").classList.contains("active")
+                && !document.getElementById("resize-width").classList.contains("active")
+                && !document.getElementById("resize-height").classList.contains("active")) {
+            document.getElementById("resize-width").disabled = true;
+            document.getElementById("resize-height").disabled = true;
         }
 
         if (!document.getElementById("resize-tool").classList.contains("active")
@@ -119,8 +132,17 @@ document.querySelectorAll("button").forEach(function(element) {
         }
     })
 });
-document.getElementById("canvas-color").addEventListener("change", function() {
+document.getElementById("resize-width").addEventListener("click", function() {
+    this.classList.toggle("active");
+    document.getElementById("resize-height").classList.remove("active");
+})
+document.getElementById("resize-height").addEventListener("click", function() {
+    this.classList.toggle("active");
+    document.getElementById("resize-width").classList.remove("active");
+})
+document.getElementById("canvas-color").addEventListener("input", function() {
     document.getElementById("canvas").style.backgroundColor = this.value;
+    current.backgroundColor = this.value;
 });
 document.getElementById("clear").addEventListener("click", function() {
     disableAllButtons();
@@ -128,7 +150,6 @@ document.getElementById("clear").addEventListener("click", function() {
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 });
-
 
 // Canvas click event based on active tools
 document.getElementById("canvas").addEventListener("click", function(e) {
@@ -210,6 +231,9 @@ document.getElementById("canvas").addEventListener("click", function(e) {
         if (getVertexInsideMouse(e) !== undefined) {
             const selected = getVertexInsideMouse(e);
             current.shapes[selected.shapeId].color[selected.vertexId] = document.getElementById("color").value;
+        } else if (getShapeInsideMouse(e) !== undefined) {
+            const selected = getShapeInsideMouse(e);
+            current.shapes[selected].color = current.shapes[selected].color.map(() => document.getElementById("color").value);
         }
         refreshCanvas();
         drawAllVertex(true);
@@ -234,16 +258,17 @@ document.getElementById("canvas").addEventListener("click", function(e) {
 });
 
 document.getElementById("canvas").addEventListener("mousedown", function(e) {
-    current.isDragging = true;
     if (document.getElementById("move-tool").classList.contains("active")) {
         current.selectedShapeId = getShapeInsideMouse(e);
         if (current.selectedShapeId !== null && current.selectedShapeId !== undefined) {
+            current.isDragging = true;
             document.getElementById("rotation_angle").disabled = false;
             document.getElementById("animate-tool").disabled = false;
             if (current.shapes[current.selectedShapeId].type === "polygon") {
                 document.getElementById("add-polygon-vertex-tool").disabled = false;
                 document.getElementById("delete-polygon-vertex-tool").disabled = false;
             }
+            drawShapeVertex(current.selectedShapeId)
         }
         else {
             document.getElementById("rotation_angle").disabled = true;
@@ -252,19 +277,24 @@ document.getElementById("canvas").addEventListener("mousedown", function(e) {
             document.getElementById("animate-tool").disabled = true;
 
         }
-        drawShapeVertex(current.selectedShapeId)
     } else if (document.getElementById("resize-tool").classList.contains("active")) {
+        const currentShape = getShapeInsideMouse(e);
+        if (currentShape !== undefined && current.shapes[currentShape].type === "rectangle") {
+            document.getElementById("resize-width").disabled = false;
+            document.getElementById("resize-height").disabled = false;
+        }
         const dragged = getVertexInsideMouse(e);
         if (dragged === undefined) {
             return;
         }
+        current.isDragging = true;
         current.selectedShapeId = dragged.shapeId;
         current.selectedVertexId = dragged.vertexId;
     }
 });
 
 document.getElementById("canvas").addEventListener("mouseup", function(e) {
-    if (document.getElementById("move-tool").classList.contains("active")) {
+    if (document.getElementById("move-tool").classList.contains("active") && current.selectedShapeId !== undefined && current.selectedShapeId !== null) {
         drawShapeVertex(current.selectedShapeId)
     }
     current.isDragging = false;
@@ -363,28 +393,45 @@ document.getElementById("canvas").addEventListener("mousemove", function(e) {
                     // Rotate back to original theta
                     onChangeRotationAngle(current.selectedShapeId, theta);
                 } else if (current.shapes[current.selectedShapeId].type === "rectangle") {
-                    // rotate back to the original position
+                    // Store theta for later rotation
                     const theta = current.shapes[current.selectedShapeId].theta;
-                    const cx = current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+2)%4].x
-                    const cy = current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+2)%4].y
-                    const center = {x: cx, y: cy}
+                    // Rotate back to 0
+                    // const cx = current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+2)%4].x
+                    // const cy = current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+2)%4].y
+                    // const center = {x: cx, y: cy}
                     onChangeRotationAngle(current.selectedShapeId, 0);
-                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
-                    current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
-                    // calculate the other vertex accounting for the rotation
-                    // const theta = current.shapes[current.selectedShapeId].theta;
-                    // const radian = theta * Math.PI / 180;
-                    
+                    // Resize
+                    // Resize width only
+                    if (document.getElementById("resize-width").classList.contains("active")) {
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
+                        if (current.selectedVertexId % 2 === 1) {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += e.movementX;
+                        } else {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += e.movementX;
+                        }
 
+                    // Resize height only
+                    } else if (document.getElementById("resize-height").classList.contains("active")) {
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
+                        if (current.selectedVertexId % 2 === 1) {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y += e.movementY;
+                        } else {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += e.movementY;
+                        }
 
-                    if (current.selectedVertexId % 2 === 1) {
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += e.movementX;
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y += e.movementY;
+                    // Resize both width and height
                     } else {
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += e.movementY;
-                        current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += e.movementX;
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
+                        current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].y += e.movementY;
+                        if (current.selectedVertexId % 2 === 1) {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].x += e.movementX;
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].y += e.movementY;
+                        } else {
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId+1)%4].y += e.movementY;
+                            current.shapes[current.selectedShapeId].vertex[(current.selectedVertexId-1+4)%4].x += e.movementX;
+                        }
                     }
-
+                    // Rotate back to original theta
                     onChangeRotationAngle(current.selectedShapeId, theta);
                 } else {
                     current.shapes[current.selectedShapeId].vertex[current.selectedVertexId].x += e.movementX;
@@ -409,42 +456,53 @@ document.getElementById("rotation_angle").addEventListener("mousemove", function
 
 
 document.getElementById("save").addEventListener("click", function(e) {
-    const data = JSON.stringify(current.shapes);
-    const a = document.createElement("a");
-    const file = new Blob([data], {type: "text/plain"});
-    a.href = URL.createObjectURL(file);
-    a.download = "shapes.json";
-    a.click();
+    disableAllButtons();
+    const save = {
+        shapes : current.shapes,
+        backgroundColor : current.backgroundColor,
+    }
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(save));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "save.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
 });
 
 document.getElementById("load").addEventListener("click", function(e) {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/json";
-    input.onchange = function() {
-        const file = input.files[0];
+    disableAllButtons();
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = e => {
+        const file = e.target.files[0];
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.readAsText(file,'UTF-8');
+        reader.onload = readerEvent => {
+            const content = readerEvent.target.result;
+            const save = JSON.parse(content);
             current = {
-                shapes : JSON.parse(e.target.result),
+                shapes : save.shapes,
                 isDrawing : false,
                 isCreating: false,
                 isDrawingPolygon : false,
                 isDragging : false,
                 selectedShapeId : null,
                 selectedVertexId : null,
-                start : {x: 0, y: 0}
+                start : {x: 0, y: 0},
+                backgroundColor : save.backgroundColor,
             }
+            document.getElementById("canvas-color").value = current.backgroundColor;
             refreshCanvas();
         }
-        reader.readAsText(file);
     }
     input.click();
 });
 
 document.getElementById("animate-tool").addEventListener("click", function(e) {
+    disableAllButtons();
     if (current.selectedShapeId !== null && current.selectedShapeId !== undefined) {
         animate(current.selectedShapeId)
-
+        current.selectedShapeId = null;
     }
 });

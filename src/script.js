@@ -60,6 +60,9 @@ function drawRectangle(rectangle) {
         convertedVertex = convertToWebGLCoordinate(rectangle.vertex[i].x, rectangle.vertex[i].y)
         color = hexToRGBColor(rectangle.color[i]);
         vertices.push(convertedVertex.x, convertedVertex.y, 0, color.r, color.g, color.b)
+        if (i == 2) {
+            vertices.push(convertedVertex.x, convertedVertex.y, 0, color.r, color.g, color.b)
+        }
     }
 
     convertedVertex = convertToWebGLCoordinate(rectangle.vertex[0].x, rectangle.vertex[0].y)
@@ -75,7 +78,7 @@ function drawRectangle(rectangle) {
         positionAttributeLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 0);
     gl.vertexAttribPointer(
         colorAttribLocation, 3, gl.FLOAT, false, 6*Float32Array.BYTES_PER_ELEMENT, 3*Float32Array.BYTES_PER_ELEMENT);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 5);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
 function drawPolygon(oldPolygon) {
