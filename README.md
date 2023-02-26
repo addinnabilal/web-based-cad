@@ -7,6 +7,38 @@
 4. Jalankan program dengan ```py -m http.server```
 5. Buka localhost:8000 di browser
 
+
+## Penjelasan Fungsi
+drawVertex(vertex, color = "#000000"): menggambar titik pada koordinat tertentu di canvas
+
+drawAllVertex(colored = false): menggambar seluruh titik-titik sudut model untuk seluruh model dalam canvas
+
+drawShapeVertex(selectedShapeId): menggambar semua titik yang terdapat pada bentuk (shape) yang terpilih pada canvas
+
+drawLine(line): menggambar persegi panjang pada canvas
+
+drawRectangle(rectangle): menggambar persegi dan persegi panjang pada canvas
+
+drawPolygon(oldPolygon): menggambar poligon pada canvas
+
+convertToWebGLCoordinate(x, y): mengubah koordinat di canvas HTML menjadi koordinat WebGL
+
+hexToRGBColor(hex): mengubah nilai hex dari sebuah warna menjadi nilai RGB
+
+disableAllButtons(): menghilangkan class active pada semua tombol yang memiliki class tersebut pada halaman HTML
+
+refreshCanvas(): menghapus isi canvas dan menggambar ulang semua bentuk yang ada pada canvas. Fungsi ini juga yang akan mengubah warna canvas jika terindikasi pengguna mengubah warna canvas
+
+getShapeInsideMouse(event): mengembalikan id bentuk yang berada pada posisi mouse saat ini
+
+calculateSquareVertices(start, end): menghitung koordinat vertex dari sebuah persegi berdasarkan koordinat start dan end yang diberikan
+
+onChangeRotationAngle(shapeId, newTheta): mengubah sudut rotasi suatu objek berdasarkan nilai sudut baru yang diberikan relatif terhadap titik pusat objek tersebut
+
+getCenter(shapeId): menghitung koordinat pusat suatu objek berdasarkan jenis objek tersebut
+
+animate(shapeId): membuat animasi rotasi suatu objek dengan mengubah sudut rotasi secara bertahap dalam interval waktu tertentu
+
 ## Manual
 ### Penggambaran Model
 ***Garis***
@@ -102,3 +134,4 @@
 ***Animasi***
 1. Pilih model dengan tombol select pada toolbar “Tools”.
 2. Tekan tombol “Animate”.
+
